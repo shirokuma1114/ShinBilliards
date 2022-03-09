@@ -35,5 +35,12 @@ public class PunServer : MonoBehaviourPunCallbacks
         //自分だけが操作できるようにスクリプトを有効にする
         PlayerController monsterScript = monster.GetComponent<PlayerController>();
         monsterScript.enabled = true;
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 実際の処理
+            GameObject ball = PhotonNetwork.Instantiate("Balls", new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity, 0);
+        }
+
     }
 }

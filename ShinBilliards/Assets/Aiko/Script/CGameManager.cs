@@ -45,6 +45,14 @@ public class CGameManager : CSingletonMonoBehaviour<CGameManager>
     public void GetCue()
     {
         _state = State.Fight;
+
+        // ボールみんなにオーナーを委譲する
+        _cDebugMainBall = FindObjectOfType<CDebugMainBall>();
+        foreach (CDebugBall ball in _cDebugBalls)
+        {
+            ball.ChangeOwner();
+        }
+        FindObjectOfType<CDebugMainBall>().ChangeOwner();
     }
 
     public void HitBall(CPlayer whichPlayer)

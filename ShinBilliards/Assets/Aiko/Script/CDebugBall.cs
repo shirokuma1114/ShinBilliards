@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class CDebugBall : MonoBehaviour//, ITouche
+public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
 {
     [SerializeField] private int _num = 1;
 
@@ -39,5 +40,10 @@ public class CDebugBall : MonoBehaviour//, ITouche
     public void MoveStop()
     {
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
+    public void ChangeOwner()
+    {
+        photonView.RequestOwnership();
     }
 }
