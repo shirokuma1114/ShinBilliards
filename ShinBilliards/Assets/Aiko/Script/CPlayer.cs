@@ -8,18 +8,30 @@ public class CPlayer : MonoBehaviour, ITouche
     private CPlayerMover _cPlayerMover = null;
 
     [SerializeField]
-    private CStick _cStick = null;
+    private CStick _cCue = null;
 
     [SerializeField]
     private IGamePlayerInput _iGamePlayerInput = null;
+    
+    private CPlayerScore _score = null;
+    public CPlayerScore Score
+    {
+        get { return _score; }
+    }
 
     enum State
     {
         Idle,
-        Damaged
+        Damaged,
+        Stop
     }
 
     State _state;
+
+    void Awake()
+    {
+        _score = gameObject.AddComponent<CPlayerScore>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -30,14 +42,14 @@ public class CPlayer : MonoBehaviour, ITouche
     // Update is called once per frame
     void Update()
     {
-        if (_state == State.Damaged) return;
+        if (_state == State.Damaged || _state == State.Stop) return;
 
 
         _cPlayerMover.Move(_iGamePlayerInput.Move(), _iGamePlayerInput.DirMove());
 
         if(_iGamePlayerInput.Action())
         {
-            _cStick.Attack();
+            if (_cCue != null)    _cCue.Attack();
         }
     }
 
@@ -89,6 +101,23 @@ public class CPlayer : MonoBehaviour, ITouche
             dir.Normalize();
             GetComponent<Rigidbody>().AddForce(dir * 20.0f, ForceMode.Impulse); // âºíËêî
         }
+    }
+
+    public void GetCue(CStick cue)
+    {
+        _cCue = cue;
+        CGameManager.Instance.GetCue();
+    }
+
+    public void MoveStop()
+    {
+        _state = State.Stop;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
+    public void MoveStart()
+    {
+        _state = State.Idle;
     }
 
 }

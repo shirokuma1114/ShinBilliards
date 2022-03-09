@@ -9,32 +9,40 @@ public interface ITouche
 
 public class CStick : MonoBehaviour
 {
+    private CStickManager _mgr = null;
+
     private Collider _collider = null;
     private Vector3 _offset;
 
+    private CPlayer _touchPlayer = null;
+    public CPlayer GetHavePlayer()
+    {
+        return _touchPlayer;
+    }
+
     enum State
     {
+        Placed,
         Idle,
         Charge,
         Attack
     }
 
     State _state;
+    
 
-    // Start is called before the first frame update
     void Start()
     {
         _collider = GetComponent<Collider>();
-        _collider.enabled = false;
-        _state = State.Idle;
-        _offset = transform.localPosition;
+        _state = State.Placed;
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public void Init(CStickManager mgr)
     {
-        
+        _mgr = mgr;
     }
+
 
     public void Attack()
     {
@@ -43,6 +51,7 @@ public class CStick : MonoBehaviour
             StartCoroutine(AttackAnim());
         }
     }
+
 
     IEnumerator AttackAnim()
     {
@@ -68,14 +77,42 @@ public class CStick : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter(Collider ohter)
+    private void OnTriggerEnter(Collider other)
     {
-        ITouche tocheObj = ohter.transform.GetComponent<ITouche>();
+        if(_state == State.Placed)
+        {
+            CPlayer touchPlayer = other.transform.GetComponent<CPlayer>();
+            if(touchPlayer != null)
+            {
+                _touchPlayer = touchPlayer;
+                transform.parent = touchPlayer.transform;
+                _collider.enabled = false;
+                _state = State.Idle;
+                _offset = new Vector3(0.64f, 0.25f, 1.28f);
+                transform.localPosition = _offset;
+                transform.localRotation = Quaternion.Euler(-81.7f, 0.0f, 0.0f);
+                touchPlayer.GetCue(this);
+            }
+
+            return;
+        }
+
+        ITouche tocheObj = other.transform.GetComponent<ITouche>();
 
         if(tocheObj != null)
         {
-            tocheObj.TouchedEnter(gameObject, ohter);
+            tocheObj.TouchedEnter(gameObject, other);
         }
+    }
+
+    public void Destroy()
+    {
+        if (_mgr != null)
+        {
+            _mgr.OnDestroyCue(this);
+            _mgr = null;
+        }
+        Destroy(gameObject);
     }
 
 }
