@@ -20,7 +20,7 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
         {
             Vector3 dir = transform.position - other.transform.position;
             dir.Normalize();
-            GetComponent<Rigidbody>().AddForce(dir * 30.0f, ForceMode.Impulse); // âºíËêî
+            GetComponent<Rigidbody>().AddForce(dir * 8.0f, ForceMode.Impulse); // âºíËêî
 
             stick.Destroy();
             CGameManager.Instance.HitBall(stick.GetHavePlayer());
