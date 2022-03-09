@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class CDebugMainBall : MonoBehaviour, ITouche
+public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
 {
     private Vector3 _offsetPos;
 
@@ -42,5 +43,10 @@ public class CDebugMainBall : MonoBehaviour, ITouche
     public void MoveStop()
     {
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
+    public void ChangeOwner()
+    {
+        photonView.RequestOwnership();
     }
 }
