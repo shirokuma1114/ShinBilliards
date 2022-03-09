@@ -62,10 +62,10 @@ public class CGameManager : CSingletonMonoBehaviour<CGameManager>
         Invoke("FinishBilliards", 5.0f);    // 仮
 
         // プレイヤーストップ
-        foreach (CPlayer player in _cPlayers)
-        {
-            player.MoveStop();
-        }
+        //foreach (CPlayer player in _cPlayers)
+        //{
+        //    player.MoveStop();
+        //}
     }
 
     public void FinishBilliards()
@@ -99,22 +99,22 @@ public class CGameManager : CSingletonMonoBehaviour<CGameManager>
             _state = State.Finish;
 
             // プレイヤーストップ
-            foreach (CPlayer player in _cPlayers)
-            {
-                player.MoveStop();
-            }
+            //foreach (CPlayer player in _cPlayers)
+            //{
+            //    player.MoveStop();
+            //}
             // メインボールストップ
-            _cDebugMainBall.MoveStop();
+            //_cDebugMainBall.MoveStop();
 
-            if (_cPlayers[0].Score.Score < _cPlayers[1].Score.Score)
-            {
-                _resultText.text = "Player 2 Win!";
-            }
-            else
-            {
-                _resultText.text = "Player 1 Win!";
-            }
-            _resultText.gameObject.SetActive(true);
+            //if (_cPlayers[0].Score.Score < _cPlayers[1].Score.Score)
+            //{
+            //    _resultText.text = "Player 2 Win!";
+            //}
+            //else
+            //{
+            //   _resultText.text = "Player 1 Win!";
+            //}
+            //_resultText.gameObject.SetActive(true);
 
         }
 
