@@ -1,0 +1,52 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Events;
+using Photon.Pun;
+
+public class CPlayerScore : MonoBehaviour// : MonoBehaviourPunCallbacks, IPunObservable
+{
+    public UnityEvent _onChanged = new UnityEvent();
+
+    private int _score = 0;
+    public int Score
+    {
+        get
+        {
+            return _score;
+        }
+        set
+        {
+            _score = value;
+
+            _onChanged.Invoke();
+        }
+    }
+
+    private void Start()
+    {
+        /*
+        if (photonView.IsMine)
+        {
+            CScoreUI.Instance.RegisterRight(this);
+        }
+        else
+        {
+            CScoreUI.Instance.RegisterLeft(this);
+        }
+        */
+    }
+    /*
+    void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(_score);
+        }
+        else
+        {
+            _score = (int)stream.ReceiveNext();
+        }
+    }
+    */
+
+}
