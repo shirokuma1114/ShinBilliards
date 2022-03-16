@@ -22,7 +22,7 @@ public class PunServer : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         // "room"という名前のルームに参加する（ルームが無ければ作成してから参加する）
-        PhotonNetwork.JoinOrCreateRoom("room", new RoomOptions(), TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("room2", new RoomOptions(), TypedLobby.Default);
     }
 
     //ルームに入室後に呼び出される
@@ -31,16 +31,16 @@ public class PunServer : MonoBehaviourPunCallbacks
         int number = PhotonNetwork.CountOfPlayersInRooms;//ルーム内人数
 
         //キャラクターを生成
-        GameObject monster = PhotonNetwork.Instantiate("PlayerSample", new Vector3(-1.0f  + number,0,-5.0f), Quaternion.identity, 0);
+        GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(-1.0f  + number,0,-5.0f), Quaternion.identity, 0);
         //自分だけが操作できるようにスクリプトを有効にする
-        PlayerController monsterScript = monster.GetComponent<PlayerController>();
-        monsterScript.enabled = true;
+        PlayerController playerScript = player.GetComponent<PlayerController>();
+        playerScript.enabled = true;
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // 実際の処理
-            GameObject ball = PhotonNetwork.Instantiate("Balls", new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity, 0);
-        }
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+        //    // 実際の処理
+        //    GameObject ball = PhotonNetwork.Instantiate("Balls", new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity, 0);
+        //}
 
     }
 }

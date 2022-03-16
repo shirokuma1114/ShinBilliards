@@ -40,6 +40,10 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - Attack
+  - AttackRPC
+  - CueAttackRPC
+  - CueRelease
+  - CueUse
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

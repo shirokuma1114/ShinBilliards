@@ -4,69 +4,38 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
-    //private enum ControlMode
-    //{
-    //    /// <summary>
-    //    /// Up moves the character forward, left and right turn the character gradually and down moves the character backwards
-    //    /// </summary>
-    //    Tank,
-    //    /// <summary>
-    //    /// Character freely moves in the chosen direction from the perspective of the camera
-    //    /// </summary>
-    //    Direct
-    //}
+    private float hTrans;
+    private float vTrans;
+    private const float transSpeed = 10f;
 
-    
-    //int maxHp = 100;
-    //[SerializeField] private int hp = 0;
+    [SerializeField] private bool attackRange = false;
+    private bool attack = false;
+    private const float attackCoolTime = 0.5f;
+    private float attackCurrentTime = 0;
 
-    bool atack = false;
+    [SerializeField] private bool cueUse = false;
 
-    [SerializeField]
-    private GameObject opponentsGameObject = null;
+    private const float attackCuePoint = 20;
+    private const float attackPoint = 10;
+    public float hp = 100;
+
+    private bool down;
+    private float downCurrentTime = 0;
+    private const float downTime = 5;
+
+    private GameObject otherPlayer;
+
+    private GameObject cueObject;
+
+    private GameObject master;
+
+    [SerializeField] KeyCode upKey = KeyCode.UpArrow;
+    [SerializeField] KeyCode downKey = KeyCode.DownArrow;
+    [SerializeField] KeyCode rightKey = KeyCode.RightArrow;
+    [SerializeField] KeyCode leftKey = KeyCode.LeftArrow;
+    [SerializeField] KeyCode attackKey = KeyCode.Return;
 
 
-    [SerializeField] private float m_moveSpeed = 2;
-    [SerializeField] private float m_turnSpeed = 200;
-    [SerializeField] private float m_jumpForce = 4;
-
-    [SerializeField] private Animator m_animator = null;
-    [SerializeField] private Rigidbody m_rigidBody = null;
-
-    //[SerializeField] private ControlMode m_controlMode = ControlMode.Direct;
-
-    private float m_currentV = 0;
-    private float m_currentH = 0;
-
-    private readonly float m_interpolation = 10;
-    private readonly float m_walkScale = 0.33f;
-    private readonly float m_backwardsWalkScale = 0.16f;
-    private readonly float m_backwardRunScale = 0.66f;
-
-    private bool m_wasGrounded;
-    private Vector3 m_currentDirection = Vector3.zero;
-
-    private float m_jumpTimeStamp = 0;
-    private float m_minJumpInterval = 0.25f;
-    private bool m_jumpInput = false;
-
-    private bool m_isGrounded;
-
-    private List<Collider> m_collisions = new List<Collider>();
-
-    private Camera mainCamera;
-
-    //キュー
-    [SerializeField]
-    private bool CueStickEnter = false;
-    [SerializeField]
-    private bool CueStickCatch = false;
-
-    //相手プレイヤー
-    [SerializeField]
-    private bool OpponentEnter = false;
-
-    [SerializeField] private GameObject cueStick;
 
     private Vector3 tableCameraPos = new Vector3(0, 3.5f, 0);
     private Vector3 tableCameraRot = new Vector3(90, 0, 0);
@@ -80,262 +49,130 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private Vector3 startRot;
     private Vector3 endRot;
 
+
     private float cameraDistance;
+
+    private bool cameraIn = false;
 
     private float cameraTransTime = 1.0f;
     private float cameraTransCurrentTime;
 
     bool cameraTransState;
 
+
+    private bool chargeStart = false;
+    private float maxCharge = 2;
+    private float currentCharge = 0;
+
+    Animator animator;
+
     private void Awake()
     {
-        if (!m_animator) { gameObject.GetComponent<Animator>(); }
-        if (!m_rigidBody) { gameObject.GetComponent<Animator>(); }
-
+        cueObject = GameObject.FindGameObjectWithTag("Cue");
+        master = GameObject.Find("Master");
 
         cameraDistance = Vector3.Distance(stageCameraPos, tableCameraPos);
-
-        cueStick = GameObject.Find("CueStick");
-
+        animator = gameObject.GetComponent<Animator>();
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void Start()
     {
-        //キュー接触
-        if (other.gameObject.tag == "Cue")
-        {
-            CueStickEnter = true;
-        }
-
-        //カメラ遷移
-        if(other.gameObject.name == "CameraTransCollider")
-        {
-            startPos = Camera.main.transform.position;
-            endPos = tableCameraPos;
-
-            startRot = Camera.main.transform.rotation.eulerAngles;
-            endRot = tableCameraRot;
-
-            cameraTransState = true;
-            cameraTransCurrentTime = 0;
-
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        //キュー接触
-        if (other.gameObject.tag == "Cue")
-        {
-            CueStickEnter = false;
-        }
-
-
-        //カメラ遷移
-        if (other.gameObject.name == "CameraTransCollider")
-        {
-            startPos = Camera.main.transform.position;
-            endPos = stageCameraPos;
-
-            startRot = Camera.main.transform.rotation.eulerAngles;
-            endRot = stageCameraRot;
-
-
-            cameraTransState = true;
-            cameraTransCurrentTime = 0;
-
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        ContactPoint[] contactPoints = collision.contacts;
-        for (int i = 0; i < contactPoints.Length; i++)
-        {
-            if (Vector3.Dot(contactPoints[i].normal, Vector3.up) > 0.5f)
-            {
-                if (!m_collisions.Contains(collision.collider))
-                {
-                    m_collisions.Add(collision.collider);
-                }
-                m_isGrounded = true;
-            }
-        }
-
-        if (collision.gameObject.tag == "Player")
-        {
-            OpponentEnter = true;
-
-
-        }
-
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        ContactPoint[] contactPoints = collision.contacts;
-        bool validSurfaceNormal = false;
-        for (int i = 0; i < contactPoints.Length; i++)
-        {
-            if (Vector3.Dot(contactPoints[i].normal, Vector3.up) > 0.5f)
-            {
-                validSurfaceNormal = true; break;
-            }
-        }
-
-        if (validSurfaceNormal)
-        {
-            m_isGrounded = true;
-            if (!m_collisions.Contains(collision.collider))
-            {
-                m_collisions.Add(collision.collider);
-            }
-        }
-        else
-        {
-            if (m_collisions.Contains(collision.collider))
-            {
-                m_collisions.Remove(collision.collider);
-            }
-            if (m_collisions.Count == 0) { m_isGrounded = false; }
-        }
-
-        if(collision.gameObject.tag == "Player")
-        {
-            OpponentEnter = true;
-            opponentsGameObject = collision.gameObject;
-        }
-
-
-
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (m_collisions.Contains(collision.collider))
-        {
-            m_collisions.Remove(collision.collider);
-        }
-        if (m_collisions.Count == 0) { m_isGrounded = false; }
-
-        if (collision.gameObject.tag == "Player")
-        {
-            OpponentEnter = false;
-        }
+        
     }
 
     private void Update()
     {
-
-        if (!photonView.IsMine) return;
-
-
-        if (!m_jumpInput && Input.GetKey(KeyCode.Space))
-        {
-            m_jumpInput = true;
-        }
-
-        CueUpdate();
+        InputUpdate();
+        TransUpdate();
         CameraUpdate();
         AttackUpdate();
+        DamageUpdate();
+        BilliardPlayUpdate();
     }
 
-    private void FixedUpdate()
+    void InputUpdate()
     {
-
         if (!photonView.IsMine) return;
 
 
-        m_animator.SetBool("Grounded", m_isGrounded);
+        hTrans = vTrans = 0;
 
-        //switch (m_controlMode)
-        //{
-        //    case ControlMode.Direct:
-        //        DirectUpdate();
-        //        break;
+        if (!Input.anyKey) return;
 
-        //    case ControlMode.Tank:
-        //        TankUpdate();
-        //        break;
+        if (Input.GetKey(upKey))
+            vTrans = 1;
+        else if (Input.GetKey(downKey))
+            vTrans = -1;
 
-        //    default:
-        //        Debug.LogError("Unsupported state");
-        //        break;
-        //}
-        DirectUpdate();
+        if (Input.GetKey(rightKey))
+            hTrans = 1;
+        else if (Input.GetKey(leftKey))
+            hTrans = -1;
 
-        m_wasGrounded = m_isGrounded;
-        m_jumpInput = false;
+        if (Input.GetKeyDown(attackKey))
+            attack = true;
     }
 
-    /*
-     * private void TankUpdate()
+    void TransUpdate()
     {
-        float v = Input.GetAxis("Vertical");
-        float h = Input.GetAxis("Horizontal");
+        if (down) return;
 
-        bool walk = Input.GetKey(KeyCode.LeftShift);
+        Vector3 pos = new Vector3(hTrans, 0, vTrans);
+        pos = Vector3.Normalize(pos) * transSpeed * Time.deltaTime;
 
-        if (v < 0)
+
+        transform.position += pos;
+
+        if(pos != new Vector3(0,0,0))
         {
-            if (walk) { v *= m_backwardsWalkScale; }
-            else { v *= m_backwardRunScale; }
+            animator.SetBool("Run",true);
+            transform.rotation = Quaternion.LookRotation(pos);
+
         }
-        else if (walk)
+        else
         {
-            v *= m_walkScale;
+            animator.SetBool("Run", false);
         }
 
-        m_currentV = Mathf.Lerp(m_currentV, v, Time.deltaTime * m_interpolation);
-        m_currentH = Mathf.Lerp(m_currentH, h, Time.deltaTime * m_interpolation);
 
-        transform.position += transform.forward * m_currentV * m_moveSpeed * Time.deltaTime;
-        transform.Rotate(0, m_currentH * m_turnSpeed * Time.deltaTime, 0);
-
-        m_animator.SetFloat("MoveSpeed", m_currentV);
-
-        JumpingAndLanding();
     }
-    */
 
-    private void AttackUpdate()
+    void AttackUpdate()
     {
+        if (!attackRange) return;//敵が攻撃範囲内
+        if (!attack) return;//攻撃入力取得
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (otherPlayer.GetComponent<PlayerController>().down) return;
+
+        if(attackCurrentTime == 0)//開始フレームで攻撃
         {
-            //武器攻撃
-            if (CueStickCatch)
+            //敵にダメージを与える
+            if(cueUse)
             {
-                Debug.Log("Stick Attack");
+                photonView.RPC(nameof(AttackRPC), RpcTarget.All);
             }
-            //殴り攻撃
-            else if(OpponentEnter)
+            else
             {
-                photonView.RPC(nameof(Attack), RpcTarget.All);
-                Debug.Log("Fight");
-
-                if(atack)
-                {
-                    atack = false;
-                    return;
-                }
-
-                atack = true;
+                photonView.RPC(nameof(CueAttackRPC), RpcTarget.All);
             }
         }
-        
-    }
 
+        attackCurrentTime += Time.deltaTime;
 
-    [PunRPC]
-    private void Attack()
-    {
-        PhotonNetwork.LocalPlayer.Damage(10);
+        //クールタイム
+        if(attackCoolTime >= attackCurrentTime)
+        {
+            attackCurrentTime = 0;
+            attack = false;
+        }
     }
 
     private void CameraUpdate()
     {
-        if(cameraTransState)
+        if (!photonView.IsMine) return;
+
+
+        if (cameraTransState)
         {
             float speed = 5f;
 
@@ -343,7 +180,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 
 
-            if(cameraTransCurrentTime >= 1.0f)
+            if (cameraTransCurrentTime >= 1.0f)
             {
                 cameraTransState = false;
                 cameraTransCurrentTime = 0;
@@ -360,98 +197,194 @@ public class PlayerController : MonoBehaviourPunCallbacks
         }
     }
 
-    private void CueUpdate()
+    private void DamageUpdate()
     {
-        //キュー取得
-
-
-        if (Input.GetMouseButtonDown(0))
+        if (hp <= 0 && !down)
         {
-            if (CueStickEnter)
+            photonView.RPC(nameof(CueRelease), RpcTarget.All);
+            down = true;
+            cueUse = false;
+            hp = 100;
+
+            animator.SetTrigger("Knockdown");
+        }
+        else if (down)
+        {
+            downCurrentTime += Time.deltaTime;
+
+            if (downCurrentTime >= downTime)
             {
-                m_animator.SetLayerWeight(2, 1);
-                CueStickCatch = true;
-                cueStick.transform.parent = this.gameObject.transform;
-                cueStick.transform.position = this.gameObject.transform.position + new Vector3(0, 0.3f, 0) + this.gameObject.transform.right * 0.2f;
-                cueStick.transform.rotation = this.gameObject.transform.rotation * Quaternion.Euler(90, -120, -90);
+                down = false;
+                downCurrentTime = 0;
             }
+        }
+        else
+            return;
+    }
+
+
+    private void BilliardPlayUpdate()
+    {
+        if (!cameraIn) return;
+
+        //プレイヤー向き
+        var targetWorldPos = this.gameObject.transform.position;
+
+        // ワールド座標をスクリーン座標に変換
+        Vector2 targetScreenPos = Camera.main.WorldToScreenPoint(targetWorldPos);
+        Vector2 mousePos = Input.mousePosition;
+
+        Vector2 dir2d = mousePos - targetScreenPos;
+        Vector3 dir3d = new Vector3(dir2d.x, 0, dir2d.y);
+        dir3d = Vector3.Normalize(dir3d);
+
+        transform.rotation = Quaternion.LookRotation(dir3d);
+
+
+        //マウスクリックでチャージ
+        if(Input.GetMouseButtonDown(0))
+        {
+            chargeStart = true;
         }
         else if(Input.GetMouseButton(0))
         {
-            //if(CueStickCatch)
-            //{
-                
-            //}
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            if (CueStickCatch)
+            
+            if(currentCharge >= maxCharge)
             {
-                m_animator.SetLayerWeight(2, 0);
-                CueStickCatch = false;
-                cueStick.transform.parent = null;
+                //突く
+                cueObject.GetComponent<Cue>().Hit(this.gameObject);
+                //chargeStart = false;
+                //currentCharge = 0;
+                return;
+            }
+
+            currentCharge += Time.deltaTime;// * 0.1f;
+
+            cueObject.GetComponent<Cue>().Charge(this.gameObject, currentCharge);
+
+        }
+        else if(Input.GetMouseButtonUp(0))
+        {
+            //突く
+            chargeStart = false;
+            cueObject.GetComponent<Cue>().Hit(this.gameObject);
+            currentCharge = 0;
+
+        }
+
+
+
+    }
+
+    [PunRPC]
+    private void AttackRPC()
+    {
+        otherPlayer.GetComponent<PlayerController>().hp -= attackPoint;
+
+    }
+
+    [PunRPC]
+    private void CueAttackRPC()
+    {
+        otherPlayer.GetComponent<PlayerController>().hp -= attackCuePoint;
+    }
+
+    [PunRPC]
+    private void CueUse(PhotonMessageInfo info)
+    {
+        if(PhotonNetwork.NetworkingClient.LocalPlayer.ActorNumber == info.Sender.ActorNumber)
+        {
+            cueObject.GetComponent<Cue>().ChangeOwner();
+        }
+
+        cueObject.GetComponent<Cue>().CueUse();
+        cueObject.GetComponent<Cue>().SetTransform(this.gameObject);
+    }
+
+    [PunRPC]
+    private void CueRelease(PhotonMessageInfo info)
+    {
+        cueObject.GetComponent<Cue>().CueRelease();
+        cueObject.GetComponent<Cue>().ResetTransform();
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            attackRange = true;
+            otherPlayer = other.gameObject;
+        }
+
+        if (other.gameObject.tag == "Cue")
+        {
+            if (!other.GetComponent<Cue>().GetCueIsUse && !this.down)
+            {
+                cueUse = true;
+                photonView.RPC(nameof(CueUse), RpcTarget.All);
             }
         }
 
+        //カメラ遷移
+        if (other.gameObject.name == "CameraTransCollider")
+        {
+            startPos = Camera.main.transform.position;
+            endPos = tableCameraPos;
 
+            startRot = Camera.main.transform.rotation.eulerAngles;
+            endRot = tableCameraRot;
+
+            cameraTransState = true;
+            cameraTransCurrentTime = 0;
+
+            cameraIn = true;
+        }
     }
 
-    private void DirectUpdate()
+    private void OnTriggerStay(Collider other)
     {
-        float v = Input.GetAxis("Vertical");
-        float h = Input.GetAxis("Horizontal");
-
-        Transform camera = Camera.main.transform;
-
-        if (Input.GetKey(KeyCode.LeftShift))
+        if(other.gameObject.tag == "Player")
         {
-            v *= m_walkScale;
-            h *= m_walkScale;
+            attackRange = true;
+            otherPlayer = other.gameObject;
         }
 
-        m_currentV = Mathf.Lerp(m_currentV, v, Time.deltaTime * m_interpolation);
-        m_currentH = Mathf.Lerp(m_currentH, h, Time.deltaTime * m_interpolation);
-
-        Vector3 direction = camera.forward * m_currentV + camera.right * m_currentH;
-
-        float directionLength = direction.magnitude;
-        direction.y = 0;
-        direction = direction.normalized * directionLength;
-
-        if (direction != Vector3.zero)
+        if(other.gameObject.tag == "Cue")
         {
-            m_currentDirection = Vector3.Slerp(m_currentDirection, direction, Time.deltaTime * m_interpolation);
-
-            transform.rotation = Quaternion.LookRotation(m_currentDirection);
-            transform.position += m_currentDirection * m_moveSpeed * Time.deltaTime;
-
-            m_animator.SetFloat("MoveSpeed", direction.magnitude);
+            if(!other.GetComponent<Cue>().GetCueIsUse && !this.down)
+            {
+                cueUse = true;
+                photonView.RPC(nameof(CueUse), RpcTarget.All);
+            }
         }
-
-
-       
-
-        //JumpingAndLanding();
     }
 
-    private void JumpingAndLanding()
+    private void OnTriggerExit(Collider other)
     {
-        bool jumpCooldownOver = (Time.time - m_jumpTimeStamp) >= m_minJumpInterval;
+        if (other.gameObject.tag == "Player")
+            attackRange = true;
 
-        if (jumpCooldownOver && m_isGrounded && m_jumpInput)
-        {
-            m_jumpTimeStamp = Time.time;
-            m_rigidBody.AddForce(Vector3.up * m_jumpForce, ForceMode.Impulse);
-        }
+        if (other.gameObject.tag == "Cue")
+            cueUse = true;
 
-        if (!m_wasGrounded && m_isGrounded)
-        {
-            m_animator.SetTrigger("Land");
-        }
 
-        if (!m_isGrounded && m_wasGrounded)
+        //カメラ遷移
+        if (other.gameObject.name == "CameraTransCollider")
         {
-            m_animator.SetTrigger("Jump");
+            startPos = Camera.main.transform.position;
+            endPos = stageCameraPos;
+
+            startRot = Camera.main.transform.rotation.eulerAngles;
+            endRot = stageCameraRot;
+
+
+            cameraTransState = true;
+            cameraTransCurrentTime = 0;
+
+            cameraIn = false;
+
         }
     }
+
 }
