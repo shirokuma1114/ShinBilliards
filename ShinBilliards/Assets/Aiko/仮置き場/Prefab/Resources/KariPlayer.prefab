@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 3201505575862394049}
   - component: {fileID: -6844744045674738301}
   m_Layer: 0
-  m_Name: Player
+  m_Name: KariPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

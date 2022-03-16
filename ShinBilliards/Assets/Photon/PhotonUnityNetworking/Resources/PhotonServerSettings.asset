@@ -40,7 +40,6 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - Attack
-<<<<<<< HEAD
   - FinishBilliardsRPC
   - GetCueRPC
   - GoalBallRPC
@@ -51,12 +50,10 @@ MonoBehaviour:
   - Init
   - ReCreate
   - GameFinishRPC
-=======
   - AttackRPC
   - CueAttackRPC
   - CueRelease
   - CueUse
->>>>>>> 827d4a06fb6c5e95a4f1f1003b402de739849ea0
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
