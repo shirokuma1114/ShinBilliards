@@ -37,9 +37,9 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
     public void CreatePlayer(int num)
     {
         //キャラクターを生成
-        GameObject player = PhotonNetwork.Instantiate("KariPlayer", new Vector3(-1.0f + (num - 1) * 3.0f, 0, -5.0f), Quaternion.identity, 0);
+        GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(-1.0f + (num - 1) * 3.0f, 0, -5.0f), Quaternion.identity, 0);
         //自分だけが操作できるようにスクリプトを有効にする
-        CPlayer playerScript = player.GetComponent<CPlayer>();
+        PlayerController playerScript = player.GetComponent<PlayerController>();
         playerScript.enabled = true;
 
         //_player = playerScript;

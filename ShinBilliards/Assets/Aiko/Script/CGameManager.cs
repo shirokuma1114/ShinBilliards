@@ -6,8 +6,8 @@ using Photon.Pun;
 
 public class CGameManager : MonoBehaviourPunCallbacks
 {
-    private CStickManager _cueManager;
-    private CPlayer _player;
+    public CStickManager _cueManager;
+    private PlayerController _player;
     private List<CDebugBall> _cDebugBalls = new List<CDebugBall>();
     private CDebugMainBall _cDebugMainBall;
     [SerializeField] Text _resultText;
@@ -57,7 +57,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
             foreach (var obj in PhotonNetwork.PhotonViewCollection)
             {
                 //プレイヤー取得
-                CPlayer cPlayer = obj.GetComponent<CPlayer>();
+                PlayerController cPlayer = obj.GetComponent<PlayerController>();
                 if(cPlayer != null)
                 {
                     // 自分のみ取得
@@ -131,7 +131,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
     public void GetCue()
     {
         photonView.RPC(nameof(GetCueRPC), RpcTarget.AllViaServer, PhotonNetwork.LocalPlayer.ActorNumber);
-        Debug.Log("Get");
+
     }
 
     [PunRPC]
@@ -143,7 +143,8 @@ public class CGameManager : MonoBehaviourPunCallbacks
             if (PhotonNetwork.LocalPlayer.ActorNumber == actorNum)
             {
                 //一致している場合キューをプレイヤーが取得する(キューのオーナー変更も行う)
-                _cueManager.Cue().Picked(_player);
+                _cueManager.Cue().CueUse(_player);
+                _player.CueUse();
 
                 // ボールのオーナーを変更する
                 foreach (CDebugBall ball in _cDebugBalls)
@@ -170,6 +171,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
     private void LostCueRPC()
     {
         _state = State.BeachFlags;
+        _cueManager.Cue().CueRelease();
     }
 
     public void HitBall()
@@ -186,7 +188,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
         _state = State.Billiards;
 
         // プレイヤーストップ
-        _player.MoveStop();
+        //_player.MoveStop();
 
         // キュー消去
         _cueManager.Cue().Destroy();
@@ -215,7 +217,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
             _cueManager.CreateCue(false);
         }
 
-        _player.MoveStart();
+        //_player.MoveStart();
 
     }
 
@@ -269,7 +271,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
     {
 
         // プレイヤーストップ
-        _player.MoveStop();
+        //_player.MoveStop();
         //メインボールストップ
         _cDebugMainBall.MoveStop();
 
