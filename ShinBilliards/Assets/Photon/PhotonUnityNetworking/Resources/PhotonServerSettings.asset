@@ -40,6 +40,16 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - Attack
+  - FinishBilliardsRPC
+  - GetCueRPC
+  - GoalBallRPC
+  - HitBallRPC
+  - LostCueRPC
+  - SetCueRPC
+  - StartGameRPC
+  - Init
+  - ReCreate
+  - GameFinishRPC
   - AttackRPC
   - CueAttackRPC
   - CueRelease

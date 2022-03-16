@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public interface ITouche
 {
     void TouchedEnter(GameObject other, Collider collider);
 }
 
-public class CStick : MonoBehaviour
+public class CStick : MonoBehaviourPunCallbacks
 {
     private CStickManager _mgr = null;
 
@@ -79,8 +80,11 @@ public class CStick : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+
+        // èEÇ§éûÇÃèàóù
         if(_state == State.Placed)
         {
+            /*
             CPlayer touchPlayer = other.transform.GetComponent<CPlayer>();
             if(touchPlayer != null)
             {
@@ -93,9 +97,16 @@ public class CStick : MonoBehaviour
                 transform.localRotation = Quaternion.Euler(-81.7f, 0.0f, 0.0f);
                 touchPlayer.GetCue(this);
             }
-
+            */
+            if (other.GetComponent<PhotonView>().OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                CGameManager.Instance.GetCue();
+            }
+            Debug.Log("Touch");
             return;
         }
+        
+        if (!photonView.AmOwner) return;
 
         ITouche tocheObj = other.transform.GetComponent<ITouche>();
 
@@ -105,14 +116,30 @@ public class CStick : MonoBehaviour
         }
     }
 
+    public void Picked(CPlayer player)
+    {
+        ChangeOwner();
+        _touchPlayer = player;
+        transform.parent = player.transform;
+        _collider.enabled = false;
+        _state = State.Idle;
+        _offset = new Vector3(0.64f, 0.25f, 1.28f);
+        transform.localPosition = _offset;
+        transform.localRotation = Quaternion.Euler(-81.7f, 0.0f, 0.0f);
+        player.GetCue(this);
+        Debug.Log("Picked");
+    }
+
     public void Destroy()
     {
-        if (_mgr != null)
-        {
-            _mgr.OnDestroyCue(this);
-            _mgr = null;
-        }
-        Destroy(gameObject);
+        if (!photonView.IsMine) return;
+
+        PhotonNetwork.Destroy(gameObject);
+    }
+
+    public void ChangeOwner()
+    {
+        photonView.RequestOwnership();
     }
 
 }

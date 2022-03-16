@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CPlayer : MonoBehaviour, ITouche
 {
@@ -12,7 +13,8 @@ public class CPlayer : MonoBehaviour, ITouche
 
     [SerializeField]
     private IGamePlayerInput _iGamePlayerInput = null;
-    
+
+    [SerializeField]
     private CPlayerScore _score = null;
     public CPlayerScore Score
     {
@@ -27,16 +29,13 @@ public class CPlayer : MonoBehaviour, ITouche
     }
 
     State _state;
-
-    void Awake()
-    {
-        _score = gameObject.AddComponent<CPlayerScore>();
-    }
-
     // Start is called before the first frame update
     void Start()
     {
         _state = State.Idle;
+
+        // ‰¼
+        GetComponentInChildren<Text>().text = "Me";
     }
 
     // Update is called once per frame
@@ -106,7 +105,6 @@ public class CPlayer : MonoBehaviour, ITouche
     public void GetCue(CStick cue)
     {
         _cCue = cue;
-        CGameManager.Instance.GetCue();
     }
 
     public void MoveStop()

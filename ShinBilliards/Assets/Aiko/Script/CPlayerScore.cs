@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Photon.Pun;
 
-public class CPlayerScore : MonoBehaviour// : MonoBehaviourPunCallbacks, IPunObservable
+public class CPlayerScore : MonoBehaviourPunCallbacks, IPunObservable
 {
     public UnityEvent _onChanged = new UnityEvent();
 
@@ -24,7 +24,7 @@ public class CPlayerScore : MonoBehaviour// : MonoBehaviourPunCallbacks, IPunObs
 
     private void Start()
     {
-        /*
+        
         if (photonView.IsMine)
         {
             CScoreUI.Instance.RegisterRight(this);
@@ -33,20 +33,20 @@ public class CPlayerScore : MonoBehaviour// : MonoBehaviourPunCallbacks, IPunObs
         {
             CScoreUI.Instance.RegisterLeft(this);
         }
-        */
+        
     }
-    /*
+    
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(_score);
+            stream.SendNext(Score);
         }
         else
         {
-            _score = (int)stream.ReceiveNext();
+            Score = (int)stream.ReceiveNext();
         }
     }
-    */
+    
 
 }
