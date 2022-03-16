@@ -48,7 +48,7 @@ public class CPlayer : MonoBehaviour, ITouche
 
         if(_iGamePlayerInput.Action())
         {
-            if (_cCue != null)    _cCue.Attack();
+            if (_cCue != null)    _cCue.Shot();
         }
     }
 

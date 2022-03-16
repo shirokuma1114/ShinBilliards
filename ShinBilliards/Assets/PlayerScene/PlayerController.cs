@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private GameObject cueObject;
 
-    private GameObject master;
+    //private GameObject master;
 
     [SerializeField] KeyCode upKey = KeyCode.UpArrow;
     [SerializeField] KeyCode downKey = KeyCode.DownArrow;
@@ -37,10 +37,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 
 
-    private Vector3 tableCameraPos = new Vector3(0, 3.5f, 0);
+    private Vector3 tableCameraPos = new Vector3(0, 10.0f, 0);
     private Vector3 tableCameraRot = new Vector3(90, 0, 0);
 
-    private Vector3 stageCameraPos = new Vector3(0, 5.4f, -8.5f);
+    private Vector3 stageCameraPos = new Vector3(0, 10.0f, -10.5f);
     private Vector3 stageCameraRot = new Vector3(45, 0, 0);
 
     private Vector3 startPos;
@@ -66,13 +66,23 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     Animator animator;
 
+
+    private CPlayerScore _score = null;
+    public CPlayerScore Score
+    {
+        get { return _score; }
+    }
+
+
     private void Awake()
     {
-        cueObject = GameObject.FindGameObjectWithTag("Cue");
-        master = GameObject.Find("Master");
+        //cueObject = GameObject.FindGameObjectWithTag("Cue");
+        //master = GameObject.Find("Master");
 
         cameraDistance = Vector3.Distance(stageCameraPos, tableCameraPos);
         animator = gameObject.GetComponent<Animator>();
+
+        _score = GetComponent<CPlayerScore>();
     }
 
     private void Start()
@@ -201,7 +211,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if (hp <= 0 && !down)
         {
-            photonView.RPC(nameof(CueRelease), RpcTarget.All);
+            // 落とす
+            CGameManager.Instance.LostCue();
+            //photonView.RPC(nameof(CueRelease), RpcTarget.All);
             down = true;
             cueUse = false;
             hp = 100;
@@ -240,6 +252,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         transform.rotation = Quaternion.LookRotation(dir3d);
 
+        if (!cueUse) return;
 
         //マウスクリックでチャージ
         if(Input.GetMouseButtonDown(0))
@@ -252,7 +265,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             if(currentCharge >= maxCharge)
             {
                 //突く
-                cueObject.GetComponent<Cue>().Hit(this.gameObject);
+                
+                CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
                 //chargeStart = false;
                 //currentCharge = 0;
                 return;
@@ -260,14 +274,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             currentCharge += Time.deltaTime;// * 0.1f;
 
-            cueObject.GetComponent<Cue>().Charge(this.gameObject, currentCharge);
+            CGameManager.Instance._cueManager.Cue().Charge(this.gameObject, currentCharge / maxCharge);
 
         }
         else if(Input.GetMouseButtonUp(0))
         {
             //突く
             chargeStart = false;
-            cueObject.GetComponent<Cue>().Hit(this.gameObject);
+            CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
             currentCharge = 0;
 
         }
@@ -294,18 +308,23 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if(PhotonNetwork.NetworkingClient.LocalPlayer.ActorNumber == info.Sender.ActorNumber)
         {
-            cueObject.GetComponent<Cue>().ChangeOwner();
+            cueObject.GetComponent<CStick>().ChangeOwner();
         }
 
-        cueObject.GetComponent<Cue>().CueUse();
-        cueObject.GetComponent<Cue>().SetTransform(this.gameObject);
+        //cueObject.GetComponent<CStick>().CueUse();
+        cueObject.GetComponent<CStick>().SetTransform(this.gameObject);
+    }
+    
+    public void CueUse()
+    {
+        cueUse = true;
     }
 
     [PunRPC]
     private void CueRelease(PhotonMessageInfo info)
     {
-        cueObject.GetComponent<Cue>().CueRelease();
-        cueObject.GetComponent<Cue>().ResetTransform();
+        cueObject.GetComponent<CStick>().CueRelease();
+        cueObject.GetComponent<CStick>().ResetTransform();
     }
 
 
@@ -319,10 +338,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         if (other.gameObject.tag == "Cue")
         {
-            if (!other.GetComponent<Cue>().GetCueIsUse && !this.down)
+            if (!other.GetComponent<CStick>().GetCueIsUse && !this.down)
             {
-                cueUse = true;
-                photonView.RPC(nameof(CueUse), RpcTarget.All);
+                //cueUse = true;
+                CGameManager.Instance.GetCue();
+                //photonView.RPC(nameof(CueUse), RpcTarget.All);
             }
         }
 
@@ -352,10 +372,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         if(other.gameObject.tag == "Cue")
         {
-            if(!other.GetComponent<Cue>().GetCueIsUse && !this.down)
+            if(!other.GetComponent<CStick>().GetCueIsUse && !this.down)
             {
-                cueUse = true;
-                photonView.RPC(nameof(CueUse), RpcTarget.All);
+                //cueUse = true;
+                CGameManager.Instance.GetCue();
+                //photonView.RPC(nameof(CueUse), RpcTarget.All);
             }
         }
     }

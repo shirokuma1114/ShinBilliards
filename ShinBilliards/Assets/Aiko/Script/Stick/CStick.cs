@@ -15,22 +15,24 @@ public class CStick : MonoBehaviourPunCallbacks
     private Collider _collider = null;
     private Vector3 _offset;
 
-    private CPlayer _touchPlayer = null;
-    public CPlayer GetHavePlayer()
-    {
-        return _touchPlayer;
-    }
+    private float _currentCharge = 0.0f;
+    
 
     enum State
     {
         Placed,
         Idle,
         Charge,
-        Attack
+        Shot
     }
 
     State _state;
-    
+
+    public bool GetCueIsUse
+    {
+        get { return _state == State.Placed; }
+    }
+
 
     void Start()
     {
@@ -45,16 +47,16 @@ public class CStick : MonoBehaviourPunCallbacks
     }
 
 
-    public void Attack()
+    public void Shot()
     {
         if(_state == State.Idle)
         {
-            StartCoroutine(AttackAnim());
+            StartCoroutine(ShotAnim());
         }
     }
 
 
-    IEnumerator AttackAnim()
+    IEnumerator ShotAnim()
     {
         _state = State.Charge;
         
@@ -64,7 +66,7 @@ public class CStick : MonoBehaviourPunCallbacks
             yield return null;
         }
 
-        _state = State.Attack;
+        _state = State.Shot;
         _collider.enabled = true;
 
         for (float time = 0.0f; time < 0.1f; time += Time.deltaTime)
@@ -116,18 +118,67 @@ public class CStick : MonoBehaviourPunCallbacks
         }
     }
 
-    public void Picked(CPlayer player)
+    public void SetTransform(GameObject parentObj)
+    {
+        this.gameObject.transform.parent = parentObj.transform;
+        //this.gameObject.transform.localPosition = new Vector3(0.5f, 1, 0);// + parentObj.transform.position;
+        this.gameObject.transform.localRotation = Quaternion.Euler(0, 90, 90);// * Quaternion.Euler(parentObj.transform.forward);
+    }
+
+    public void ResetTransform()
+    {
+        this.gameObject.transform.parent = null;
+
+        this.gameObject.transform.localPosition += new Vector3(-0.1f, 0, 0);
+        this.gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+    }
+
+    public void Charge(GameObject player, float late)
+    {
+        transform.localPosition = Vector3.Lerp(_offset, _offset - Vector3.forward, late);
+        //transform.position = player.transform.position + (power * -(player.transform.rotation * Vector3.forward));
+        //transform.localPosition = new Vector3(0.5f, 1, 0) + (power * (player.transform.rotation * new Vector3(-1, 0, 0)));
+    }
+
+    public void Hit(GameObject player, float currentCharge)
+    {
+        _currentCharge = currentCharge;
+
+        _state = State.Shot;
+        _collider.enabled = true;
+        transform.localPosition = _offset;
+
+        Invoke("FinishAttack", 0.1f);
+
+    }
+
+    private void FinishAttack()
+    {
+        _state = State.Idle;
+        //_collider.enabled = false;
+    }
+
+    public void CueUse(PlayerController player)
     {
         ChangeOwner();
-        _touchPlayer = player;
-        transform.parent = player.transform;
-        _collider.enabled = false;
         _state = State.Idle;
-        _offset = new Vector3(0.64f, 0.25f, 1.28f);
+
+        // ˆÊ’uˆÚ“®
+        transform.parent = player.transform;
+        _offset = new Vector3(0.64f, 0.75f, 1.28f);
         transform.localPosition = _offset;
         transform.localRotation = Quaternion.Euler(-81.7f, 0.0f, 0.0f);
-        player.GetCue(this);
-        Debug.Log("Picked");
+
+        _collider.enabled = false;
+    }
+
+    public void CueRelease()
+    {
+        _state = State.Placed;
+        transform.parent = null;
+
+        transform.localPosition += new Vector3(-0.1f, 0, 0);
+        transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
     public void Destroy()
