@@ -177,8 +177,9 @@ public class CStick : MonoBehaviourPunCallbacks
         _state = State.Placed;
         transform.parent = null;
 
-        transform.localPosition += new Vector3(-0.1f, 0, 0);
-        transform.rotation = Quaternion.Euler(0, 0, 0);
+        transform.position = new Vector3(transform.position.x, 1.0f, transform.position.z);
+        transform.rotation = Quaternion.Euler(-81.702f, 0, 0);
+        _collider.enabled = true;
     }
 
     public void Destroy()
