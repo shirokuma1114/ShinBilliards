@@ -22,6 +22,7 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
         if (stick != null)
         {
             Vector3 dir = transform.position - other.transform.position;
+            dir.y = 0.0f;
             dir.Normalize();
             GetComponent<Rigidbody>().AddForce(dir * 8.0f, ForceMode.Impulse); // âºíËêî
             

@@ -16,14 +16,14 @@ public class CScoreUI : CSingletonMonoBehaviour<CScoreUI>
     {
         // ƒIƒtƒ‰ƒCƒ“
         
-        CPlayer[] players = FindObjectsOfType<CPlayer>();
-        if(players.Length >= 2)
-        {
-            _playerScores[0] = players[0].Score;
-            _playerScores[1] = players[1].Score;
-            _playerScores[0]._onChanged.AddListener(UpdateScoreTextRight);
-            _playerScores[1]._onChanged.AddListener(UpdateScoreTextLeft);
-        }
+        //CPlayer[] players = FindObjectsOfType<CPlayer>();
+        //if(players.Length >= 2)
+        //{
+        //    _playerScores[0] = players[0].Score;
+        //    _playerScores[1] = players[1].Score;
+        //    _playerScores[0]._onChanged.AddListener(UpdateScoreTextRight);
+        //    _playerScores[1]._onChanged.AddListener(UpdateScoreTextLeft);
+        //}
         
     }
 
