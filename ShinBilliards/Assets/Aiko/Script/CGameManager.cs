@@ -187,11 +187,10 @@ public class CGameManager : MonoBehaviourPunCallbacks
     {
         _state = State.Billiards;
 
-        // プレイヤーストップ
-        //_player.MoveStop();
-
         // キュー消去
         _cueManager.Cue().Destroy();
+
+        _player.CueNoUse();
     }
 
     public void FinishBilliards()

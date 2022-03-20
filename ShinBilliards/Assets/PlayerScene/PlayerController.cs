@@ -226,7 +226,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (hp <= 0 && !down)
         {
             // —‚Æ‚·
-            CGameManager.Instance.LostCue();
+            if (cueUse)
+            {
+                CGameManager.Instance.LostCue();
+            }
             //photonView.RPC(nameof(CueRelease), RpcTarget.All);
             down = true;
             cueUse = false;
@@ -346,7 +349,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
         cueObject.GetComponent<CStick>().CueRelease();
         cueObject.GetComponent<CStick>().ResetTransform();
     }
-
+    
+    public void CueNoUse()
+    {
+        cueUse = false;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -407,7 +414,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             attackRange = true;
 
         if (other.gameObject.tag == "Cue")
-            cueUse = true;
+            cueUse = false;
 
 
         //ƒJƒƒ‰‘JˆÚ
