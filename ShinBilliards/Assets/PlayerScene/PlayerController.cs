@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     [SerializeField] private bool attackRange = false;
     private bool attack = false;
-    private const float attackCoolTime = 0.5f;
+    private const float attackCoolTime = 0.2f;
     private float attackCurrentTime = 0;
 
     [SerializeField] private bool cueUse = false;
@@ -149,28 +149,40 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     void AttackUpdate()
     {
-        if (!attackRange) return;//“G‚ªUŒ‚”ÍˆÍ“à
         if (!attack) return;//UŒ‚“ü—Íæ“¾
+        if (!photonView.IsMine) return;
 
-        if (otherPlayer.GetComponent<PlayerController>().down) return;
 
-        if(attackCurrentTime == 0)//ŠJnƒtƒŒ[ƒ€‚ÅUŒ‚
+        bool otherDown = false;
+
+        if (otherPlayer != null)
+            otherDown = otherPlayer.GetComponent<PlayerController>().down;//“G‚ªƒ_ƒEƒ“’†‚ÌUŒ‚”»’è
+
+
+
+        if (attackCurrentTime == 0)//ŠJnƒtƒŒ[ƒ€‚ÅUŒ‚
         {
             //“G‚Éƒ_ƒ[ƒW‚ğ—^‚¦‚é
-            if(cueUse)
+            if (cueUse)
             {
-                photonView.RPC(nameof(AttackRPC), RpcTarget.All);
+                animator.SetTrigger("CueAttack");
+                if (attackRange && !otherDown)//“G‚ªUŒ‚”ÍˆÍ
+                    photonView.RPC(nameof(CueAttackRPC), RpcTarget.All);
             }
             else
             {
-                photonView.RPC(nameof(CueAttackRPC), RpcTarget.All);
+                animator.SetTrigger("Attack");
+
+                Debug.Log("hit");
+                if (attackRange && !otherDown)//“G‚ªUŒ‚”ÍˆÍ
+                    photonView.RPC(nameof(AttackRPC), RpcTarget.All);
             }
         }
 
         attackCurrentTime += Time.deltaTime;
 
         //ƒN[ƒ‹ƒ^ƒCƒ€
-        if(attackCoolTime >= attackCurrentTime)
+        if(attackCurrentTime>= attackCoolTime)
         {
             attackCurrentTime = 0;
             attack = false;
@@ -209,6 +221,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void DamageUpdate()
     {
+        if (!photonView.IsMine) return;
+
         if (hp <= 0 && !down)
         {
             // —‚Æ‚·
@@ -218,7 +232,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             cueUse = false;
             hp = 100;
 
-            animator.SetTrigger("Knockdown");
+            animator.SetBool("Knockdown",true);
         }
         else if (down)
         {
@@ -228,6 +242,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 down = false;
                 downCurrentTime = 0;
+                animator.SetBool("Knockdown", false);
+
             }
         }
         else
@@ -238,6 +254,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void BilliardPlayUpdate()
     {
         if (!cameraIn) return;
+        if (!photonView.IsMine) return;
+        if (down) return;
 
         //ƒvƒŒƒCƒ„[Œü‚«
         var targetWorldPos = this.gameObject.transform.position;
@@ -258,6 +276,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if(Input.GetMouseButtonDown(0))
         {
             chargeStart = true;
+            animator.SetBool("Shot", true);
         }
         else if(Input.GetMouseButton(0))
         {
@@ -267,6 +286,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 //“Ë‚­
                 
                 CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
+                animator.SetBool("Shot", false);
                 //chargeStart = false;
                 //currentCharge = 0;
                 return;
@@ -282,6 +302,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             //“Ë‚­
             chargeStart = false;
             CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
+            animator.SetBool("Shot", false);
             currentCharge = 0;
 
         }
@@ -294,7 +315,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void AttackRPC()
     {
         otherPlayer.GetComponent<PlayerController>().hp -= attackPoint;
-
     }
 
     [PunRPC]
