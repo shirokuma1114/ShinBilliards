@@ -17,15 +17,28 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
 
         if (!photonView.AmOwner) return;
 
-        // スティックに触れられた
-        CStick stick = other.GetComponent<CStick>();
-        if (stick != null)
+        //// スティックに触れられた
+        //CStick stick = other.GetComponent<CStick>();
+        //if (stick != null)
+        //{
+        //    Vector3 dir = transform.position - other.transform.position;
+        //    dir.y = 0.0f;
+        //    dir.Normalize();
+        //    GetComponent<Rigidbody>().AddForce(dir * 8.0f, ForceMode.Impulse); // 仮定数
+            
+        //    CGameManager.Instance.HitBall();
+        //}
+    }
+
+    public void Hit(CStick cue, float force)
+    {
+        if (cue != null)
         {
-            Vector3 dir = transform.position - other.transform.position;
+            Vector3 dir = transform.position - cue.transform.position;
             dir.y = 0.0f;
             dir.Normalize();
-            GetComponent<Rigidbody>().AddForce(dir * 8.0f, ForceMode.Impulse); // 仮定数
-            
+            GetComponent<Rigidbody>().AddForce(dir * force, ForceMode.Impulse);
+
             CGameManager.Instance.HitBall();
         }
     }
@@ -49,12 +62,13 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
     {
         // 再生成
         transform.position = _offsetPos;
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        MoveStop();
     }
 
     public void MoveStop()
     {
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
     }
 
     public void ChangeOwner()
