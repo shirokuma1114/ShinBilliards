@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private bool chargeStart = false;
     private float maxCharge = 2;
     private float currentCharge = 0;
+    private Rigidbody _rb;
 
     Animator animator;
 
@@ -83,6 +84,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         animator = gameObject.GetComponent<Animator>();
 
         _score = GetComponent<CPlayerScore>();
+
+        _rb = GetComponent<Rigidbody>();
     }
 
     private void Start()
@@ -128,10 +131,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (down) return;
 
         Vector3 pos = new Vector3(hTrans, 0, vTrans);
-        pos = Vector3.Normalize(pos) * transSpeed * Time.deltaTime;
-
-
-        transform.position += pos;
+        _rb.velocity = Vector3.Normalize(pos) * transSpeed;
+        //pos = Vector3.Normalize(pos) * transSpeed * Time.deltaTime;
+        //transform.position += pos;
 
         if(pos != new Vector3(0,0,0))
         {
@@ -142,6 +144,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         else
         {
             animator.SetBool("Run", false);
+            _rb.angularVelocity = Vector3.zero;
         }
 
 
@@ -166,6 +169,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             if (cueUse)
             {
                 animator.SetTrigger("CueAttack");
+                CGameManager.Instance._cueManager.Cue().Attack();
                 if (attackRange && !otherDown)//ìGÇ™çUåÇîÕàÕ
                     photonView.RPC(nameof(CueAttackRPC), RpcTarget.All);
             }
@@ -288,7 +292,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 //ìÀÇ≠
                 
-                CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
+                //CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
                 animator.SetBool("Shot", false);
                 //chargeStart = false;
                 //currentCharge = 0;
