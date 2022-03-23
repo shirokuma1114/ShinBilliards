@@ -187,11 +187,10 @@ public class CGameManager : MonoBehaviourPunCallbacks
     {
         _state = State.Billiards;
 
-        // プレイヤーストップ
-        //_player.MoveStop();
-
         // キュー消去
         _cueManager.Cue().Destroy();
+
+        _player.CueNoUse();
     }
 
     public void FinishBilliards()
@@ -275,9 +274,9 @@ public class CGameManager : MonoBehaviourPunCallbacks
         //メインボールストップ
         _cDebugMainBall.MoveStop();
 
-        CPlayer[] players = FindObjectsOfType<CPlayer>();   //TODO
+        PlayerController[] players = FindObjectsOfType<PlayerController>();   //TODO
 
-        CPlayer winner = players[0].Score.Score > players[1].Score.Score ? players[0] : players[1];
+        PlayerController winner = players[0].Score.Score > players[1].Score.Score ? players[0] : players[1];
 
         FindObjectOfType<CResultCanvas>().SetWinLose(winner == _player);    //TODO
 

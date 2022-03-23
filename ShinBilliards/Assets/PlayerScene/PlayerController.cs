@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     [SerializeField] private bool attackRange = false;
     private bool attack = false;
-    private const float attackCoolTime = 0.5f;
+    private const float attackCoolTime = 0.2f;
     private float attackCurrentTime = 0;
 
     [SerializeField] private bool cueUse = false;
@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private bool chargeStart = false;
     private float maxCharge = 2;
     private float currentCharge = 0;
+    private Rigidbody _rb;
 
     Animator animator;
 
@@ -83,6 +84,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         animator = gameObject.GetComponent<Animator>();
 
         _score = GetComponent<CPlayerScore>();
+
+        _rb = GetComponent<Rigidbody>();
     }
 
     private void Start()
@@ -128,10 +131,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (down) return;
 
         Vector3 pos = new Vector3(hTrans, 0, vTrans);
-        pos = Vector3.Normalize(pos) * transSpeed * Time.deltaTime;
-
-
-        transform.position += pos;
+        _rb.velocity = Vector3.Normalize(pos) * transSpeed;
+        //pos = Vector3.Normalize(pos) * transSpeed * Time.deltaTime;
+        //transform.position += pos;
 
         if(pos != new Vector3(0,0,0))
         {
@@ -142,6 +144,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         else
         {
             animator.SetBool("Run", false);
+            _rb.angularVelocity = Vector3.zero;
         }
 
 
@@ -149,28 +152,41 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     void AttackUpdate()
     {
-        if (!attackRange) return;//ìGÇ™çUåÇîÕàÕì‡
         if (!attack) return;//çUåÇì¸óÕéÊìæ
+        if (!photonView.IsMine) return;
 
-        if (otherPlayer.GetComponent<PlayerController>().down) return;
 
-        if(attackCurrentTime == 0)//äJénÉtÉåÅ[ÉÄÇ≈çUåÇ
+        bool otherDown = false;
+
+        if (otherPlayer != null)
+            otherDown = otherPlayer.GetComponent<PlayerController>().down;//ìGÇ™É_ÉEÉìíÜÇÃçUåÇîªíË
+
+
+
+        if (attackCurrentTime == 0)//äJénÉtÉåÅ[ÉÄÇ≈çUåÇ
         {
             //ìGÇ…É_ÉÅÅ[ÉWÇó^Ç¶ÇÈ
-            if(cueUse)
+            if (cueUse)
             {
-                photonView.RPC(nameof(AttackRPC), RpcTarget.All);
+                animator.SetTrigger("CueAttack");
+                CGameManager.Instance._cueManager.Cue().Attack();
+                if (attackRange && !otherDown)//ìGÇ™çUåÇîÕàÕ
+                    photonView.RPC(nameof(CueAttackRPC), RpcTarget.All);
             }
             else
             {
-                photonView.RPC(nameof(CueAttackRPC), RpcTarget.All);
+                animator.SetTrigger("Attack");
+
+                Debug.Log("hit");
+                if (attackRange && !otherDown)//ìGÇ™çUåÇîÕàÕ
+                    photonView.RPC(nameof(AttackRPC), RpcTarget.All);
             }
         }
 
         attackCurrentTime += Time.deltaTime;
 
         //ÉNÅ[ÉãÉ^ÉCÉÄ
-        if(attackCoolTime >= attackCurrentTime)
+        if(attackCurrentTime>= attackCoolTime)
         {
             attackCurrentTime = 0;
             attack = false;
@@ -209,16 +225,21 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void DamageUpdate()
     {
+        if (!photonView.IsMine) return;
+
         if (hp <= 0 && !down)
         {
             // óéÇ∆Ç∑
-            CGameManager.Instance.LostCue();
+            if (cueUse)
+            {
+                CGameManager.Instance.LostCue();
+            }
             //photonView.RPC(nameof(CueRelease), RpcTarget.All);
             down = true;
             cueUse = false;
             hp = 100;
 
-            animator.SetTrigger("Knockdown");
+            animator.SetBool("Knockdown",true);
         }
         else if (down)
         {
@@ -228,6 +249,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 down = false;
                 downCurrentTime = 0;
+                animator.SetBool("Knockdown", false);
+
             }
         }
         else
@@ -238,6 +261,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void BilliardPlayUpdate()
     {
         if (!cameraIn) return;
+        if (!photonView.IsMine) return;
+        if (down) return;
 
         //ÉvÉåÉCÉÑÅ[å¸Ç´
         var targetWorldPos = this.gameObject.transform.position;
@@ -258,6 +283,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if(Input.GetMouseButtonDown(0))
         {
             chargeStart = true;
+            animator.SetBool("Shot", true);
         }
         else if(Input.GetMouseButton(0))
         {
@@ -266,7 +292,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 //ìÀÇ≠
                 
-                CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
+                //CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
+                animator.SetBool("Shot", false);
                 //chargeStart = false;
                 //currentCharge = 0;
                 return;
@@ -282,6 +309,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             //ìÀÇ≠
             chargeStart = false;
             CGameManager.Instance._cueManager.Cue().Hit(this.gameObject, currentCharge);
+            animator.SetBool("Shot", false);
             currentCharge = 0;
 
         }
@@ -294,7 +322,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void AttackRPC()
     {
         otherPlayer.GetComponent<PlayerController>().hp -= attackPoint;
-
     }
 
     [PunRPC]
@@ -326,7 +353,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
         cueObject.GetComponent<CStick>().CueRelease();
         cueObject.GetComponent<CStick>().ResetTransform();
     }
-
+    
+    public void CueNoUse()
+    {
+        cueUse = false;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -387,7 +418,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             attackRange = true;
 
         if (other.gameObject.tag == "Cue")
-            cueUse = true;
+            cueUse = false;
 
 
         //ÉJÉÅÉâëJà⁄

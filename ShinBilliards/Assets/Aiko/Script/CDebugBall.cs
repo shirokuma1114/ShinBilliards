@@ -46,6 +46,7 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
     public void MoveStop()
     {
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
     }
 
     public void ChangeOwner()
