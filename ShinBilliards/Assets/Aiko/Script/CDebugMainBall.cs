@@ -6,10 +6,15 @@ using Photon.Pun;
 public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
 {
     private Vector3 _offsetPos;
+    private bool _isStart = false;  // ビリヤードがスタートしているか
+
+    CPredictionLine _predictionLine = null;
 
     void Start()
     {
         _offsetPos = transform.position;
+
+        _predictionLine = GetComponent<CPredictionLine>();
     }
 
     public void TouchedEnter(GameObject other, Collider collider)
@@ -30,17 +35,20 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
         //}
     }
 
-    public void Hit(CStick cue, float force)
+    public void ShowPrediction(Vector3 dir)
     {
-        if (cue != null)
-        {
-            Vector3 dir = transform.position - cue.transform.position;
-            dir.y = 0.0f;
-            dir.Normalize();
-            GetComponent<Rigidbody>().AddForce(dir * force, ForceMode.Impulse);
+        dir.y = 0.0f;
+        dir.Normalize();
+        _predictionLine.Show(dir);
+    }
 
-            CGameManager.Instance.HitBall();
-        }
+    public void Hit(Vector3 dir, float force)
+    {
+        dir.y = 0.0f;
+        dir.Normalize();
+        GetComponent<Rigidbody>().AddForce(dir * force, ForceMode.Impulse);
+
+        CGameManager.Instance.HitBall();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -65,6 +73,28 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
         MoveStop();
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_isStart)
+        {
+            // 衝突力によって音量変化させる
+            float force = collision.impulse.magnitude;
+            if (force < 0.1f) return;
+            force = force * 0.25f;
+            if (force > 1.0f) force = 1.0f;
+
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Ball"))
+            {
+                SoundManager.Instance.PlaySE("Ball_Collide", false, force);
+            }
+            else
+            {
+                SoundManager.Instance.PlaySE("Cue_Shot", false, force);
+            }
+        }
+    }
+
+
     public void MoveStop()
     {
         GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -74,5 +104,10 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
     public void ChangeOwner()
     {
         photonView.RequestOwnership();
+    }
+
+    public void StartBilliards()
+    {
+        _isStart = true;
     }
 }

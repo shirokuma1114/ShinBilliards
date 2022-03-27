@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class CGameManager : MonoBehaviourPunCallbacks
 {
     public CStickManager _cueManager;
     private PlayerController _player;
+    private PlayerController _playerOther;
     private List<CDebugBall> _cDebugBalls = new List<CDebugBall>();
     private CDebugMainBall _cDebugMainBall;
     [SerializeField] Text _resultText;
@@ -60,10 +62,14 @@ public class CGameManager : MonoBehaviourPunCallbacks
                 PlayerController cPlayer = obj.GetComponent<PlayerController>();
                 if(cPlayer != null)
                 {
-                    // 自分のみ取得
+                    // 自分か相手か
                     if (obj.OwnerActorNr == PhotonNetwork.LocalPlayer.ActorNumber)
                     {
                         _player = cPlayer;
+                    }
+                    else
+                    {
+                        _playerOther = cPlayer;
                     }
                 }
 
@@ -130,8 +136,12 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
     public void GetCue()
     {
-        photonView.RPC(nameof(GetCueRPC), RpcTarget.AllViaServer, PhotonNetwork.LocalPlayer.ActorNumber);
+        if (_state == State.Finish) return;
 
+        if (_state == State.BeachFlags)
+        {
+            photonView.RPC(nameof(GetCueRPC), RpcTarget.AllViaServer, PhotonNetwork.LocalPlayer.ActorNumber);
+        }
     }
 
     [PunRPC]
@@ -153,18 +163,24 @@ public class CGameManager : MonoBehaviourPunCallbacks
                 }
                 _cDebugMainBall.ChangeOwner();
 
-                Debug.Log("GetCue");
+                SoundManager.Instance.PlaySE("Cue_Get");
             }
-        }
 
-        _state = State.Fight;
+            _state = State.Fight;
+
+            _cueManager.Cue().Take();
+
+            foreach (CDebugBall ball in _cDebugBalls)
+            {
+                ball.StartBilliards();
+            }
+            _cDebugMainBall.StartBilliards();
+        }
     }
 
     public void LostCue()
     {
-
         photonView.RPC(nameof(LostCueRPC), RpcTarget.AllViaServer);
-
     }
 
     [PunRPC]
@@ -186,6 +202,9 @@ public class CGameManager : MonoBehaviourPunCallbacks
     private void HitBallRPC()
     {
         _state = State.Billiards;
+
+        // キューショット音（ついでにここに）
+        SoundManager.Instance.PlaySE("Cue_Shot");
 
         // キュー消去
         _cueManager.Cue().Destroy();
@@ -220,16 +239,19 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
     }
 
-    public void GoalBall(CDebugBall ball)
+    public void GoalBall(CDebugBall ball, Transform goal)
     {
         if(_state == State.Billiards)
         {
             _player.Score.Score += ball.Get_num();
         }
+        Debug.Log(_state);
+        //ビリヤード中以外にゴールする場合は無し前提
 
         photonView.RPC(nameof(GoalBallRPC), RpcTarget.All, ball.Get_num());
 
-        //ビリヤード中以外にゴールする場合は無し前提
+        //PhotonNetwork.Instantiate("GoalEffect", goal.position, Quaternion.AngleAxis(-90f, Vector3.right), 0);
+
     }
 
     [PunRPC]
@@ -247,6 +269,8 @@ public class CGameManager : MonoBehaviourPunCallbacks
                 break;
             }
         }
+
+        SoundManager.Instance.PlaySE("Ball_Goal");
         Debug.Log(removeBall);
         _cDebugBalls.Remove(removeBall);
 
@@ -265,20 +289,42 @@ public class CGameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    // 他プレイヤーがルームから退出した時に呼ばれるコールバック
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        // ゲーム終了する
+        if (_state != State.Finish)
+        {
+            _state = State.Finish;
+            GameFinishRPC(true);
+        }
+    }
+
     [PunRPC]
-    private void GameFinishRPC()
+    private void GameFinishRPC(bool forceFinish = false)
     {
 
         // プレイヤーストップ
         //_player.MoveStop();
         //メインボールストップ
         _cDebugMainBall.MoveStop();
+        
+        MasterData.Instance._myPlayerScore = _player.Score.Score;
+        
+        if(forceFinish)
+        {// 強制終了時処理
+            MasterData.Instance._otherPlayerScore = 0;
+            MasterData.Instance._myPlayerWin = true;
+        }
+        else
+        {
+            MasterData.Instance._otherPlayerScore = _playerOther.Score.Score;
+            MasterData.Instance._myPlayerWin = _player.Score.Score >= _playerOther.Score.Score;
+        }
 
-        PlayerController[] players = FindObjectsOfType<PlayerController>();   //TODO
+        FindObjectOfType<CResultCanvas>().SetWinLose(MasterData.Instance._myPlayerWin);    //TODO
 
-        PlayerController winner = players[0].Score.Score > players[1].Score.Score ? players[0] : players[1];
-
-        FindObjectOfType<CResultCanvas>().SetWinLose(winner == _player);    //TODO
+        Time.timeScale = 0.0f;  //TODO
 
     }
 }

@@ -25,6 +25,8 @@ public class CStick : MonoBehaviourPunCallbacks
     private Vector3 _offsetRot = new Vector3(-90.0f, 0.0f, -7.966f);
     [SerializeField]
     private LayerMask _hitLayerMask = 0;
+    [SerializeField]
+    private GameObject _effect = null;
 
     
 
@@ -74,19 +76,21 @@ public class CStick : MonoBehaviourPunCallbacks
                 pos = Vector3.Lerp(pos, pos + transform.up, _pull);    // チャージ分
                 transform.position = pos;
 
-                // 当たり判定
-                if (_state == State.Shot)
+                if (hit.transform.CompareTag("MainBall"))
                 {
-                    if (hit.transform.CompareTag("MainBall"))
+                    CDebugMainBall tocheObj = hit.transform.GetComponent<CDebugMainBall>();
+                    if (tocheObj != null)
                     {
-                        if(_pull < 0.0f)
+                        Vector3 dir = hit.transform.position - transform.position;
+                        // 予測線表示
+                        tocheObj.ShowPrediction(dir);
+                        
+                        // 当たり判定
+                        if (_state == State.Shot)
                         {
-                            // ヒット
-                            CDebugMainBall tocheObj = hit.transform.GetComponent<CDebugMainBall>();
-
-                            if (tocheObj != null)
-                            {
-                                tocheObj.Hit(this, _charge * 10.0f);
+                            if (_pull < 0.0f)
+                            {// ヒット
+                                tocheObj.Hit(dir, _charge * 10.0f);
                                 _pull = 0.0f;
                                 _charge = 0.0f;
                                 _state = State.Idle;
@@ -185,9 +189,14 @@ public class CStick : MonoBehaviourPunCallbacks
         transform.parent = player.transform;
         transform.localPosition = _offsetPos;
         transform.localRotation = Quaternion.Euler(_offsetRot);
+    }
 
+    // キュー取得済み
+    public void Take()
+    {
         if (_collider == null) _collider = GetComponent<Collider>();
         _collider.enabled = false;
+        _effect.SetActive(false);
     }
 
     // キュー落とす
@@ -197,12 +206,16 @@ public class CStick : MonoBehaviourPunCallbacks
         _pull = 0.0f;
         _charge = 0.0f;
 
-        transform.parent = null;
-        transform.position = new Vector3(transform.position.x, 1.0f, transform.position.z);
-        transform.rotation = Quaternion.Euler(-81.702f, 0, 0);
+        if (photonView.IsMine)
+        {
+            transform.parent = null;
+            transform.position = new Vector3(transform.position.x, 1.0f, transform.position.z);
+            transform.rotation = Quaternion.Euler(-81.702f, 0, 0);
+        }
 
         if (_collider == null) _collider = GetComponent<Collider>();
         _collider.enabled = true;
+        _effect.SetActive(true);
     }
 
     // キュー消える

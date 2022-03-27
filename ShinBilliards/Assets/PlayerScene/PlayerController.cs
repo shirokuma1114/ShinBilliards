@@ -19,9 +19,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private const float attackPoint = 10;
     public float hp = 100;
 
-    private bool down;
+    private bool down = false;
+    private bool getup = false;
     private float downCurrentTime = 0;
-    private const float downTime = 5;
+    private const float downTime = 5;//フレーム/60
+    private const float getupTime = 3;//立ち上がり始める時間
 
     private GameObject otherPlayer;
 
@@ -37,11 +39,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 
 
-    private Vector3 tableCameraPos = new Vector3(0, 10.0f, 0);
-    private Vector3 tableCameraRot = new Vector3(90, 0, 0);
+    [SerializeField]private Vector3 tableCameraPos = new Vector3(0, 10.0f, 0);
+    [SerializeField]private Vector3 tableCameraRot = new Vector3(90, 0, 0);
+    
+    [SerializeField]private Vector3 stageCameraPos = new Vector3(0, 10.0f, -10.5f);
+    [SerializeField] private Vector3 stageCameraRot = new Vector3(45, 0, 0);
 
-    private Vector3 stageCameraPos = new Vector3(0, 10.0f, -10.5f);
-    private Vector3 stageCameraRot = new Vector3(45, 0, 0);
+    [SerializeField] private float tableFieldofView = 60;
+    [SerializeField] private float stageFieldofView = 70;
 
     private Vector3 startPos;
     private Vector3 endPos;
@@ -49,6 +54,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private Vector3 startRot;
     private Vector3 endRot;
 
+    private float startFieldofView;
+    private float endFieldofView;
 
     private float cameraDistance;
 
@@ -67,6 +74,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     Animator animator;
 
+    private Camera mainCamera;
 
     private CPlayerScore _score = null;
     public CPlayerScore Score
@@ -79,6 +87,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         //cueObject = GameObject.FindGameObjectWithTag("Cue");
         //master = GameObject.Find("Master");
+
+        mainCamera = Camera.main;
 
         cameraDistance = Vector3.Distance(stageCameraPos, tableCameraPos);
         animator = gameObject.GetComponent<Animator>();
@@ -215,10 +225,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             Vector3 transPos = Vector3.Lerp(startPos, endPos, cameraTransCurrentTime);
             Vector3 transRot = Vector3.Slerp(startRot, endRot, cameraTransCurrentTime);
+            float view = endFieldofView * cameraTransCurrentTime + startFieldofView * (1 - cameraTransCurrentTime);
 
-            Camera.main.transform.position = transPos;
-            Camera.main.transform.rotation = Quaternion.Euler(transRot);
-
+            mainCamera.transform.position = transPos;
+            mainCamera.transform.rotation = Quaternion.Euler(transRot);
+            mainCamera.fieldOfView = view;
 
         }
     }
@@ -240,16 +251,25 @@ public class PlayerController : MonoBehaviourPunCallbacks
             hp = 100;
 
             animator.SetBool("Knockdown",true);
+            animator.SetBool("GetUp",false);
+
         }
         else if (down)
         {
             downCurrentTime += Time.deltaTime;
 
-            if (downCurrentTime >= downTime)
+            if(downCurrentTime >= getupTime && !getup)
+            {
+                animator.SetBool("Knockdown", false);
+                animator.SetBool("GetUp", true);
+
+                getup = true;
+            }
+            else if (downCurrentTime >= downTime)
             {
                 down = false;
                 downCurrentTime = 0;
-                animator.SetBool("Knockdown", false);
+                getup = false;
 
             }
         }
@@ -263,12 +283,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (!cameraIn) return;
         if (!photonView.IsMine) return;
         if (down) return;
+        if (!cueUse) return;
 
         //プレイヤー向き
         var targetWorldPos = this.gameObject.transform.position;
 
         // ワールド座標をスクリーン座標に変換
-        Vector2 targetScreenPos = Camera.main.WorldToScreenPoint(targetWorldPos);
+        Vector2 targetScreenPos = mainCamera.WorldToScreenPoint(targetWorldPos);
         Vector2 mousePos = Input.mousePosition;
 
         Vector2 dir2d = mousePos - targetScreenPos;
@@ -277,7 +298,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         transform.rotation = Quaternion.LookRotation(dir3d);
 
-        if (!cueUse) return;
 
         //マウスクリックでチャージ
         if(Input.GetMouseButtonDown(0))
@@ -380,11 +400,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
         //カメラ遷移
         if (other.gameObject.name == "CameraTransCollider")
         {
-            startPos = Camera.main.transform.position;
+            startPos = mainCamera.transform.position;
             endPos = tableCameraPos;
 
-            startRot = Camera.main.transform.rotation.eulerAngles;
+            startRot = mainCamera.transform.rotation.eulerAngles;
             endRot = tableCameraRot;
+
+            startFieldofView = mainCamera.fieldOfView;
+            endFieldofView = tableFieldofView;
 
             cameraTransState = true;
             cameraTransCurrentTime = 0;
@@ -424,11 +447,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
         //カメラ遷移
         if (other.gameObject.name == "CameraTransCollider")
         {
-            startPos = Camera.main.transform.position;
+            startPos = mainCamera.transform.position;
             endPos = stageCameraPos;
 
-            startRot = Camera.main.transform.rotation.eulerAngles;
+            startRot = mainCamera.transform.rotation.eulerAngles;
             endRot = stageCameraRot;
+
+            startFieldofView = mainCamera.fieldOfView;
+            endFieldofView = stageFieldofView;
 
 
             cameraTransState = true;
