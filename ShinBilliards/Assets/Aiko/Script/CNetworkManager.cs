@@ -78,4 +78,13 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
+    // サーバー切断時に呼ばれる
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.Log($"サーバーとの接続が切断されました: {cause.ToString()}");
+
+        //タイトルに戻る
+
+    }
+
 }
