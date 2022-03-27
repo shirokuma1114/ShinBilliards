@@ -7,12 +7,15 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
 {
     [SerializeField] private int _num = 1;
     private bool _isGoal = false;
+    private bool _isStart = false;  // ビリヤードがスタートしているか
+
 
     public int Get_num()
     {
         return _num;
     }
 
+    // 未使用
     public void TouchedEnter(GameObject other, Collider collider)
     {
         if (!photonView.AmOwner) return;
@@ -37,9 +40,30 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
 
         if (other.CompareTag("goal"))
         {
-            CGameManager.Instance.GoalBall(this);
+            CGameManager.Instance.GoalBall(this, other.transform);
             _isGoal = true;
             //PhotonNetwork.Destroy(gameObject);    // まとめてInstantiateしていると思うような挙動にならない
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_isStart)
+        {
+            // 衝突力によって音量変化させる
+            float force = collision.impulse.magnitude;
+            if (force < 0.1f) return;
+            force = force * 0.25f;
+            if (force > 1.0f) force = 1.0f;
+
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Ball"))
+            {
+                SoundManager.Instance.PlaySE("Ball_Collide", false, force);
+            }
+            else
+            {
+                SoundManager.Instance.PlaySE("Cue_Shot", false, force);
+            }
         }
     }
 
@@ -52,5 +76,11 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
     public void ChangeOwner()
     {
         photonView.RequestOwnership();
+    }
+
+
+    public void StartBilliards()
+    {
+        _isStart = true;
     }
 }
