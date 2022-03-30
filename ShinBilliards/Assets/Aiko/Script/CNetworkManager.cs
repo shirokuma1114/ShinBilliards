@@ -13,6 +13,9 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private CNetworkObjectManager _objMng = null;
 
+    [SerializeField]
+    private GameObject _disconnectPrefab = null;
+
     void Start()
     {
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
@@ -37,7 +40,7 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
         roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
 
         // "room"という名前のルームに参加する（ルームが無ければ作成してから参加する）
-        PhotonNetwork.JoinOrCreateRoom("aiko", roomOptions, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("neko", roomOptions, TypedLobby.Default);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
@@ -83,7 +86,9 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     {
         Debug.Log($"サーバーとの接続が切断されました: {cause.ToString()}");
 
+        Time.timeScale = 0.0f;
         //タイトルに戻る
+        Instantiate(_disconnectPrefab);
 
     }
 

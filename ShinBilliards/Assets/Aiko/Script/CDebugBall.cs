@@ -40,7 +40,7 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
 
         if (other.CompareTag("goal"))
         {
-            CGameManager.Instance.GoalBall(this, other.transform);
+            CGameManager.Instance.GoalBall(this, other.bounds.center);
             _isGoal = true;
             //PhotonNetwork.Destroy(gameObject);    // まとめてInstantiateしていると思うような挙動にならない
         }
@@ -58,7 +58,11 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
 
             if (collision.gameObject.layer == LayerMask.NameToLayer("Ball"))
             {
-                SoundManager.Instance.PlaySE("Ball_Collide", false, force);
+                if (photonView.AmOwner)
+                {
+                    photonView.RPC(nameof(Ball_CollideSoundRPC), RpcTarget.All, force);
+                }
+                //SoundManager.Instance.PlaySE("Ball_Collide", false, force);
             }
             else
             {
@@ -66,6 +70,14 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
             }
         }
     }
+
+    // サウンドをRPCで鳴らす
+    [PunRPC]
+    private void Ball_CollideSoundRPC(float force)
+    {
+        SoundManager.Instance.PlaySE("Ball_Collide", false, force);
+    }
+
 
     public void MoveStop()
     {

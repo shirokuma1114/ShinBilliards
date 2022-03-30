@@ -51,6 +51,8 @@ public class CStick : MonoBehaviourPunCallbacks
     {
         _collider = GetComponent<Collider>();
         _state = State.Placed;
+
+        SoundManager.Instance.PlaySE("Cue_Appearance");
     }
 
     private void Update()
