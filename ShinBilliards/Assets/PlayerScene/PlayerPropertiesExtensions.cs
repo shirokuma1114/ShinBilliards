@@ -4,11 +4,17 @@ using Photon.Realtime;
 public static class PlayerPropertiesExtensions
 {
     private const string HpKey = "HP";
+    private const string PrefabNameKey = "PrefabName";
     private const string MessageKey = "Message";
 
     //private const string AttackKey = "Attack";
 
     private static readonly Hashtable propsToSet = new Hashtable();
+
+    public static string GetPrefabName(this Player player)
+    {
+        return (player.CustomProperties[PrefabNameKey] is string prefabName) ? prefabName : null;
+    }
 
     // プレイヤーのHPを取得する
     public static int GetHP(this Player player)
@@ -42,6 +48,16 @@ public static class PlayerPropertiesExtensions
     public static void SetMessage(this Player player, string message)
     {
         propsToSet[MessageKey] = message;
+        player.SetCustomProperties(propsToSet);
+        propsToSet.Clear();
+    }
+
+    // プレイヤーのプレハブ名を設定する
+    public static void SetPrefabName(this Player player, string prefabName)
+    {
+        if (!player.IsLocal) return;
+
+        propsToSet[PrefabNameKey] = prefabName;
         player.SetCustomProperties(propsToSet);
         propsToSet.Clear();
     }

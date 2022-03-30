@@ -88,7 +88,7 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
 
         Time.timeScale = 0.0f;
         //ƒ^ƒCƒgƒ‹‚É–ß‚é
-        Instantiate(_disconnectPrefab);
+        //Instantiate(_disconnectPrefab);
 
     }
 
