@@ -10,16 +10,18 @@ public class CResultCanvas : MonoBehaviour
 
     public void SetWinLose(bool win)
     {
-        if (win)
-        {
-            _text.text = "You Win!";
-            _text.color = Color.yellow;
-        }
-        else
-        {
-            _text.text = "You Lose...";
-            _text.color = Color.blue;
-        }
+
+        _text.text = "Finish!";
+        //if (win)
+        //{
+        //    _text.text = "You Win!";
+        //    _text.color = Color.yellow;
+        //}
+        //else
+        //{
+        //    _text.text = "You Lose...";
+        //    _text.color = Color.blue;
+        //}
 
         _text.gameObject.SetActive(true);
     }

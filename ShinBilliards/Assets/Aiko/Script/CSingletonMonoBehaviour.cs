@@ -24,7 +24,7 @@ public abstract class CSingletonMonoBehaviour<T> : MonoBehaviour where T : MonoB
     {
         if(Instance != this)
         {
-            Debug.LogError(typeof(T) + " のインスタンスが重複しているので破棄します。");
+            Debug.Log(typeof(T) + " のインスタンスが重複しているので破棄します。");
             Destroy(gameObject);
         }
     }

@@ -947,8 +947,9 @@ GameObject:
   - component: {fileID: 7805100048074546674}
   - component: {fileID: -741377658684239580}
   - component: {fileID: 5995176989676993485}
+  - component: {fileID: 3326359479609467800}
   m_Layer: 6
-  m_Name: PlayerGirl_2
+  m_Name: Player_Girl_1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -981,8 +982,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.75
-  m_Height: 2
+  m_Radius: 0.86
+  m_Height: 2.45
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!136 &4539118584819916651
@@ -1009,7 +1010,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -1030,11 +1031,6 @@ MonoBehaviour:
   attackRange: 0
   cueUse: 0
   hp: 100
-  upKey: 273
-  downKey: 274
-  rightKey: 275
-  leftKey: 276
-  attackKey: 13
   tableCameraPos: {x: 0, y: 10, z: 0}
   tableCameraRot: {x: 90, y: 0, z: 0}
   stageCameraPos: {x: 0, y: 12, z: -16}
@@ -1099,22 +1095,22 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 4
-    SynchronizeType: 1
+    SynchronizeType: 0
     Name: Run
-  - Type: 9
-    SynchronizeType: 2
+  - Type: 4
+    SynchronizeType: 0
     Name: Knockdown
-  - Type: 4
-    SynchronizeType: 2
-    Name: Shot
-  - Type: 4
-    SynchronizeType: 2
+  - Type: 9
+    SynchronizeType: 0
     Name: Attack
-  - Type: 4
-    SynchronizeType: 2
+  - Type: 9
+    SynchronizeType: 0
     Name: CueAttack
   - Type: 4
-    SynchronizeType: 2
+    SynchronizeType: 0
+    Name: Shot
+  - Type: 4
+    SynchronizeType: 0
     Name: GetUp
   m_SynchronizeLayers:
   - SynchronizeType: 2
@@ -1131,7 +1127,7 @@ Animator:
   m_GameObject: {fileID: 8096420286927281472}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: ad4bb82bd843da1479ee67de1f1804c5, type: 3}
-  m_Controller: {fileID: 9100000, guid: 41a02fcd9c21be0489f09fbe283115f0, type: 2}
+  m_Controller: {fileID: 9100000, guid: d4cebe9e692361a46b9c244fdf1be233, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1171,6 +1167,19 @@ MonoBehaviour:
   _onChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3326359479609467800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8096420286927281472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8334387374742d45a4a1fd19e87488a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effect: {fileID: 4280301433768861952, guid: 3c5adb5c084ba5149ab5e5ed1f21fa3e, type: 3}
 --- !u!1 &8096420286927281474
 GameObject:
   m_ObjectHideFlags: 0

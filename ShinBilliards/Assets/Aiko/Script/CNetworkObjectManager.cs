@@ -12,6 +12,14 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
     //public CDebugMainBall _mainBall = null;
     //public CStickManager _cueMng = null;
     
+    enum PlayerPrefabList
+    {
+        Player_Girl_1 = 0,
+        Player_Girl_2 = 1,
+        Player_Boy_1 = 2,
+        Player_Boy_2 = 3,
+        PrefabCount,
+    }
 
     public void CreateRoomObj()
     {
@@ -37,13 +45,23 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
     public void CreatePlayer(int num)
     {
         //キャラクターを生成
-        GameObject player = PhotonNetwork.Instantiate("PlayerBoy_1", new Vector3(-1.0f + (num - 1) * 3.0f, 0, -5.0f), Quaternion.identity, 0);
-        //自分だけが操作できるようにスクリプトを有効にする
-        PlayerController playerScript = player.GetComponent<PlayerController>();
-        playerScript.enabled = true;
+        GameObject player;
 
-        //_player = playerScript;
+        while (true)
+        {
+            PlayerPrefabList number = (PlayerPrefabList)Random.Range(0, (int)PlayerPrefabList.PrefabCount - 1);
 
+            Debug.Log(number.ToString());
+            if (GameObject.Find(number.ToString()) == null)
+            {
+                //キャラクターを生成
+                player = PhotonNetwork.Instantiate(number.ToString(), new Vector3(-1.0f + (num - 1) * 3.0f, 0, -12.0f), Quaternion.identity, 0);
+                //自分だけが操作できるようにスクリプトを有効にする
+                PlayerController playerScript = player.GetComponent<PlayerController>();
+                playerScript.enabled = true;
+                break;
+            }
+        }
     }
 
     public void StartGame()

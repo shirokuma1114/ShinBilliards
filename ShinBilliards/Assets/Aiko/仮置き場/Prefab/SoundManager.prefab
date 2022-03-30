@@ -44,7 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 550ef7300230ffc4fb3cfa4a44b9ec41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _setBGM: []
+  _setBGM:
+  - name: Game
+    audioClip: {fileID: 8300000, guid: 53e10749f4a9cd4459086866150c4aeb, type: 3}
   _setSE:
   - name: Start
     audioClip: {fileID: 8300000, guid: 37152d9dc8f845546b33431d56f7d6f2, type: 3}
@@ -66,6 +68,8 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: 8e5321652a0752848ace5ae79868e745, type: 3}
   - name: Button_Down
     audioClip: {fileID: 8300000, guid: c57ddc6a1f97aa446814f2bf3bdf0746, type: 3}
+  - name: Cue_Appearance
+    audioClip: {fileID: 8300000, guid: 4430b78943dc3f741b65b4eafdea27a6, type: 3}
   _maxVolume: 1
   _fadeTime: 0.5
 --- !u!82 &1381616724494873517

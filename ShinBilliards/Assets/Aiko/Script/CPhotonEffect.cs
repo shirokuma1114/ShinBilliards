@@ -6,6 +6,6 @@ public class CPhotonEffect : MonoBehaviourPunCallbacks
     void OnParticleSystemStopped()
     {
         if (!photonView.AmOwner) return;
-        //PhotonNetwork.Destroy(gameObject);
+        PhotonNetwork.Destroy(gameObject);
     }
 }

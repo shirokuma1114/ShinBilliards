@@ -7,12 +7,12 @@ using Photon.Realtime;
 
 public class CGameManager : MonoBehaviourPunCallbacks
 {
+    [HideInInspector]
     public CStickManager _cueManager;
     private PlayerController _player;
-    private PlayerController _playerOther;
     private List<CDebugBall> _cDebugBalls = new List<CDebugBall>();
     private CDebugMainBall _cDebugMainBall;
-    [SerializeField] Text _resultText;
+    private CTimer _timer;
 
     private bool _isInitialized = false;
 
@@ -69,7 +69,8 @@ public class CGameManager : MonoBehaviourPunCallbacks
                     }
                     else
                     {
-                        _playerOther = cPlayer;
+                        // 追加直後のプレイヤーを認識できない
+                        //_playerOther = cPlayer;
                     }
                 }
 
@@ -94,15 +95,31 @@ public class CGameManager : MonoBehaviourPunCallbacks
                     _cueManager = cueMng;
                     continue;
                 }
+
+                // タイマー取得
+                if (_timer == null)
+                {
+                    CTimer timer = obj.GetComponent<CTimer>();
+                    if(timer != null)
+                    {
+                        _timer = timer;
+                    }
+                }
             }
 
             _isInitialized = true;
         }
         _cueManager.Init();
+        FindObjectOfType<CCountDownUI>().Register(_timer);
     }
 
     public void StartGame()
     {
+        // カウントダウンタイマー生成
+        GameObject timer = PhotonNetwork.Instantiate("Timer", Vector3.zero, Quaternion.identity, 0);
+        _timer = timer.GetComponent<CTimer>();
+        _timer._onFinish.AddListener(GameTimeFinish);
+
         photonView.RPC(nameof(StartGameRPC), RpcTarget.AllViaServer);
     }
 
@@ -117,6 +134,9 @@ public class CGameManager : MonoBehaviourPunCallbacks
         {
             _cueManager.CreateCue(false);
         }
+
+        SoundManager.Instance.PlayBGM("Game", true);
+        SoundManager.Instance.PlaySE("Start");
     }
 
     /// <summary>
@@ -239,7 +259,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
     }
 
-    public void GoalBall(CDebugBall ball, Transform goal)
+    public void GoalBall(CDebugBall ball, Vector3 goalPos)
     {
         if(_state == State.Billiards)
         {
@@ -250,13 +270,15 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
         photonView.RPC(nameof(GoalBallRPC), RpcTarget.All, ball.Get_num());
 
-        //PhotonNetwork.Instantiate("GoalEffect", goal.position, Quaternion.AngleAxis(-90f, Vector3.right), 0);
+        PhotonNetwork.Instantiate("GoalEffect", goalPos, Quaternion.AngleAxis(-90f, Vector3.right), 0);
 
     }
 
     [PunRPC]
     private void GoalBallRPC(int num)
     {
+        if (_state == State.Finish) return;
+
         // 対象のボールを削除する
         CDebugBall removeBall = null;
 
@@ -282,11 +304,22 @@ public class CGameManager : MonoBehaviourPunCallbacks
                 // ゲーム終了
                 _state = State.Finish;
 
-                photonView.RPC(nameof(GameFinishRPC), RpcTarget.AllViaServer);
+                photonView.RPC(nameof(GameFinishRPC), RpcTarget.AllViaServer, false);
 
             }
 
         }
+    }
+
+    // マスタークライアントのみ
+    private void GameTimeFinish()
+    {
+        if (_state == State.Finish) return;
+
+        // ゲーム終了
+        _state = State.Finish;
+
+        photonView.RPC(nameof(GameFinishRPC), RpcTarget.AllViaServer, false);
     }
 
     // 他プレイヤーがルームから退出した時に呼ばれるコールバック
@@ -301,7 +334,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void GameFinishRPC(bool forceFinish = false)
+    private void GameFinishRPC(bool forceFinish)
     {
 
         // プレイヤーストップ
@@ -318,13 +351,30 @@ public class CGameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            MasterData.Instance._otherPlayerScore = _playerOther.Score.Score;
-            MasterData.Instance._myPlayerWin = _player.Score.Score >= _playerOther.Score.Score;
+            PlayerController[] players = FindObjectsOfType<PlayerController>();
+            foreach(PlayerController player in players)
+            {
+                if (player.photonView.OwnerActorNr != PhotonNetwork.LocalPlayer.ActorNumber)
+                {
+                    MasterData.Instance._otherPlayerScore = player.Score.Score;
+                    MasterData.Instance._myPlayerWin = _player.Score.Score >= player.Score.Score;
+                }
+            }
         }
+
+        SoundManager.Instance.PlaySE("Finish");
 
         FindObjectOfType<CResultCanvas>().SetWinLose(MasterData.Instance._myPlayerWin);    //TODO
 
         Time.timeScale = 0.0f;  //TODO
 
+        Invoke("GoToResult", 2.0f);
+
+    }
+
+    private void GoToResult()
+    {
+        Time.timeScale = 1.0f;  //TODO
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ResultScene");
     }
 }
