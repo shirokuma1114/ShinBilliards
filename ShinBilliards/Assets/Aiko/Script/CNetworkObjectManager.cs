@@ -12,7 +12,7 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
     //public CDebugMainBall _mainBall = null;
     //public CStickManager _cueMng = null;
     
-    enum PlayerPrefabList
+    public enum PlayerPrefabList
     {
         Player_Girl_1 = 0,
         Player_Girl_2 = 1,
@@ -59,6 +59,8 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
                 //自分だけが操作できるようにスクリプトを有効にする
                 PlayerController playerScript = player.GetComponent<PlayerController>();
                 playerScript.enabled = true;
+
+                PhotonNetwork.LocalPlayer.SetPrefabName(number.ToString());
                 break;
             }
         }
