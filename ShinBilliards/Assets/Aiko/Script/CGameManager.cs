@@ -159,10 +159,12 @@ public class CGameManager : MonoBehaviourPunCallbacks
             if (player.IsLocal)
             {
                 MasterData.Instance._myPlayerPrefabName = player.GetPrefabName();
+                MasterData.Instance._myPlayerName = player.NickName;
             }
             else
             {
                 MasterData.Instance._otherPlayerPrefabName = player.GetPrefabName();
+                MasterData.Instance._otherPlayerName = player.NickName;
             }
         }
 

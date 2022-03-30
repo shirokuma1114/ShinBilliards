@@ -76,7 +76,7 @@ public class ResultSceneManager : MonoBehaviour
             if(Input.GetMouseButtonDown(0))
             {
                 //タイトルシーン遷移
-
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
             }
         }
     }

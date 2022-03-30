@@ -1496,7 +1496,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 904542383428515965}
-  - component: {fileID: 8751146191629299076}
   - component: {fileID: 1189125089946379503}
   m_Layer: 6
   m_Name: ResultGirl
@@ -1522,32 +1521,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &8751146191629299076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 904542383428674653}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f858188f18c6c34d95b5fc7acae8bef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackRange: 0
-  cueUse: 0
-  hp: 100
-  upKey: 273
-  downKey: 274
-  rightKey: 275
-  leftKey: 276
-  attackKey: 13
-  tableCameraPos: {x: 0, y: 10, z: 0}
-  tableCameraRot: {x: 90, y: 0, z: 0}
-  stageCameraPos: {x: 0, y: 12, z: -16}
-  stageCameraRot: {x: 50, y: 0, z: 0}
-  tableFieldofView: 60
-  stageFieldofView: 75
 --- !u!95 &1189125089946379503
 Animator:
   serializedVersion: 3
