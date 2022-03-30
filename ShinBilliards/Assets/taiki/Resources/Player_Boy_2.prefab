@@ -239,7 +239,7 @@ GameObject:
   - component: {fileID: 8708329516280257156}
   - component: {fileID: 2734084932280237345}
   m_Layer: 6
-  m_Name: PlayerBoy_1
+  m_Name: Player_Boy_2
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -273,8 +273,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.75
-  m_Height: 2
+  m_Radius: 0.86
+  m_Height: 2.45
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!136 &1182520366718966693
@@ -301,7 +301,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -322,11 +322,6 @@ MonoBehaviour:
   attackRange: 0
   cueUse: 0
   hp: 100
-  upKey: 273
-  downKey: 274
-  rightKey: 275
-  leftKey: 276
-  attackKey: 13
   tableCameraPos: {x: 0, y: 10, z: 0}
   tableCameraRot: {x: 90, y: 0, z: 0}
   stageCameraPos: {x: 0, y: 12, z: -16}
@@ -423,7 +418,7 @@ Animator:
   m_GameObject: {fileID: 2106585151094639786}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: ad4bb82bd843da1479ee67de1f1804c5, type: 3}
-  m_Controller: {fileID: 9100000, guid: 41a02fcd9c21be0489f09fbe283115f0, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1a3ab1403eccdca47be31c857c42f12d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

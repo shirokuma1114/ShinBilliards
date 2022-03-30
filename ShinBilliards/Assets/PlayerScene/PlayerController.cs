@@ -31,11 +31,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     //private GameObject master;
 
-    [SerializeField] KeyCode upKey = KeyCode.UpArrow;
-    [SerializeField] KeyCode downKey = KeyCode.DownArrow;
-    [SerializeField] KeyCode rightKey = KeyCode.RightArrow;
-    [SerializeField] KeyCode leftKey = KeyCode.LeftArrow;
-    [SerializeField] KeyCode attackKey = KeyCode.Return;
+    //[SerializeField] KeyCode upKey = KeyCode.UpArrow;
+    //[SerializeField] KeyCode downKey = KeyCode.DownArrow;
+    //[SerializeField] KeyCode rightKey = KeyCode.RightArrow;
+    //[SerializeField] KeyCode leftKey = KeyCode.LeftArrow;
+    //[SerializeField] KeyCode attackKey = KeyCode.Return;
 
 
 
@@ -89,6 +89,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         //master = GameObject.Find("Master");
 
         mainCamera = Camera.main;
+        mainCamera.transform.position = stageCameraPos;
 
         cameraDistance = Vector3.Distance(stageCameraPos, tableCameraPos);
         animator = gameObject.GetComponent<Animator>();
@@ -122,17 +123,17 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
         if (!Input.anyKey) return;
 
-        if (Input.GetKey(upKey))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
             vTrans = 1;
-        else if (Input.GetKey(downKey))
+        else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
             vTrans = -1;
 
-        if (Input.GetKey(rightKey))
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
             hTrans = 1;
-        else if (Input.GetKey(leftKey))
+        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
             hTrans = -1;
 
-        if (Input.GetKeyDown(attackKey))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
             attack = true;
     }
 
@@ -187,7 +188,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 animator.SetTrigger("Attack");
 
-                Debug.Log("hit");
                 if (attackRange && !otherDown)//敵が攻撃範囲
                     photonView.RPC(nameof(AttackRPC), RpcTarget.All);
             }
@@ -252,7 +252,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             animator.SetBool("Knockdown",true);
             animator.SetBool("GetUp",false);
-
+            //_rb.constraints = RigidbodyConstraints.FreezePosition;
+            //_rb.constraints = RigidbodyConstraints.FreezeRotation;
+            _rb.isKinematic = true;
         }
         else if (down)
         {
@@ -271,10 +273,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 downCurrentTime = 0;
                 getup = false;
 
+                //_rb.constraints = RigidbodyConstraints.None;
+                //_rb.constraints = RigidbodyConstraints.FreezeRotation;
+                //_rb.constraints = RigidbodyConstraints.FreezePositionY;
+                //Vector3 rot = transform.rotation.eulerAngles;
+                //transform.rotation = Quaternion.Euler(0, rot.y, 0);
+                _rb.isKinematic = false;
+
             }
         }
-        else
-            return;
+        
     }
 
 
@@ -300,12 +308,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
 
         //マウスクリックでチャージ
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Return))
         {
             chargeStart = true;
             animator.SetBool("Shot", true);
         }
-        else if(Input.GetMouseButton(0))
+        else if(Input.GetMouseButton(1) || Input.GetKey(KeyCode.Return))
         {
             
             if(currentCharge >= maxCharge)
@@ -324,7 +332,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             CGameManager.Instance._cueManager.Cue().Charge(this.gameObject, currentCharge / maxCharge);
 
         }
-        else if(Input.GetMouseButtonUp(0))
+        else if(Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.Return))
         {
             //突く
             chargeStart = false;
@@ -438,7 +446,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.tag == "Player")
-            attackRange = true;
+            attackRange = false;
 
         if (other.gameObject.tag == "Cue")
             cueUse = false;
