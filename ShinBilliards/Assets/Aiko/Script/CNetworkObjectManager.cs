@@ -61,6 +61,7 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
                 playerScript.enabled = true;
 
                 PhotonNetwork.LocalPlayer.SetPrefabName(number.ToString());
+                PhotonNetwork.LocalPlayer.NickName = number.ToString();
                 break;
             }
         }

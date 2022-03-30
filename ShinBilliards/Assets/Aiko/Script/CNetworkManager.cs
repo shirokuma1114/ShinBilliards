@@ -14,7 +14,7 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     private CNetworkObjectManager _objMng = null;
 
     [SerializeField]
-    private GameObject _disconnectPrefab = null;
+    private GameObject _disconnectCanvas = null;
 
     void Start()
     {
@@ -88,7 +88,7 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
 
         Time.timeScale = 0.0f;
         //ƒ^ƒCƒgƒ‹‚É–ß‚é
-        //Instantiate(_disconnectPrefab);
+        _disconnectCanvas.SetActive(true);
 
     }
 
