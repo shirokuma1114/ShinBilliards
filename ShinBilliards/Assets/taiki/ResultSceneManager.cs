@@ -28,19 +28,19 @@ public class ResultSceneManager : MonoBehaviour
     private void Awake()
     {
         //ゲームシーンのキャラクタープレハブを生成
-        myCharacter = (GameObject)Resources.Load("ResultBoy");
-        otherCharacter = (GameObject)Resources.Load("ResultGirl");
+        myCharacter = (GameObject)Resources.Load(GetResultPrefabName(MasterData.Instance._myPlayerPrefabName));
+        otherCharacter = (GameObject)Resources.Load(GetResultPrefabName(MasterData.Instance._otherPlayerPrefabName));
         myCharacter = Instantiate(myCharacter, new Vector3(3.5f, -2.5f, 0), Quaternion.Euler(0, 180, 0));
         otherCharacter = Instantiate(otherCharacter, new Vector3(-3.5f, -1.0f, 4), Quaternion.Euler(0, 180, 0));
         otherCharacter.transform.localScale = new Vector3(2, 2, 2);
 
         //データ取得
-        winner = true;// MasterData.Instance._myPlayerWin;
-        playerName.text = "ひろむ";// MasterData.Instance._myPlayerName;
-        otherName.text = "たいき";// MasterData.Instance._otherPlayerName;
+        winner = MasterData.Instance._myPlayerWin;
+        playerName.text = MasterData.Instance._myPlayerName;
+        otherName.text = MasterData.Instance._otherPlayerName;
 
-        playerScore.text = "90";// MasterData.Instance._myPlayerScore.ToString();
-        otherScore.text = "9";// MasterData.Instance._otherPlayerScore.ToString();
+        playerScore.text = MasterData.Instance._myPlayerScore.ToString();
+        otherScore.text = MasterData.Instance._otherPlayerScore.ToString();
 
 
         winLight.SetActive(false);
@@ -48,6 +48,20 @@ public class ResultSceneManager : MonoBehaviour
         resultText.enabled = false;
         playerScore.enabled = false;
         otherScore.enabled = false;
+    }
+
+    string GetResultPrefabName(string prefabName)
+    {
+        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Boy_1.ToString() || prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Boy_2.ToString())
+        {
+            return "ResultBoy";
+        }
+
+        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Girl_1.ToString() || prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Girl_2.ToString())
+        {
+            return "ResultGirl";
+        }
+        return null;
     }
 
     void Start()

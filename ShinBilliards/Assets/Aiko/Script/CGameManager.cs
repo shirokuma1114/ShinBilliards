@@ -137,6 +137,36 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
         SoundManager.Instance.PlayBGM("Game", true);
         SoundManager.Instance.PlaySE("Start");
+
+        StartCoroutine(StartCountDown());
+    }
+
+    private IEnumerator StartCountDown()
+    {
+
+        yield return new WaitForSeconds(3.0f);
+
+
+        if (_state == State.Finish)
+        {
+            MasterData.Instance._myPlayerPrefabName = PhotonNetwork.LocalPlayer.GetPrefabName();
+            MasterData.Instance._otherPlayerPrefabName = null;
+            yield break;
+        }
+
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (player.IsLocal)
+            {
+                MasterData.Instance._myPlayerPrefabName = player.GetPrefabName();
+            }
+            else
+            {
+                MasterData.Instance._otherPlayerPrefabName = player.GetPrefabName();
+            }
+        }
+
+        Debug.Log("my : " + MasterData.Instance._myPlayerPrefabName + "other : " + MasterData.Instance._otherPlayerPrefabName);
     }
 
     /// <summary>
@@ -366,7 +396,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
         FindObjectOfType<CResultCanvas>().SetWinLose(MasterData.Instance._myPlayerWin);    //TODO
 
-        Time.timeScale = 0.0f;  //TODO
+        //Time.timeScale = 0.0f;  //TODO
 
         Invoke("GoToResult", 2.0f);
 
