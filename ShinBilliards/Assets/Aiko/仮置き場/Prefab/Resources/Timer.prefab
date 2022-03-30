@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd0966b20197c754587dbea8ecfbe804, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fGameTime: 12000
+  _fGameTime: 180000
   _onChanged:
     m_PersistentCalls:
       m_Calls: []

@@ -168,7 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MAX_PLAYER_NUM: 2
   _objMng: {fileID: 59359673}
-  _disconnectCanvas: {fileID: 0}
+  _disconnectCanvas: {fileID: 1869614383}
 --- !u!4 &59359675
 Transform:
   m_ObjectHideFlags: 0
@@ -3207,6 +3207,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1851366543}
   m_CullTransparentMesh: 1
+--- !u!1 &1869614383 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1553669583836311082, guid: a6b5a6e1887fc7a42b9ad5daf4d4784d, type: 3}
+  m_PrefabInstance: {fileID: 546006006}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1870851974
 GameObject:
   m_ObjectHideFlags: 0
