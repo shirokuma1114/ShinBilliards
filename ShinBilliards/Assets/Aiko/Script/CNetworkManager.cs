@@ -33,23 +33,23 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         // ランダムなルームに参加
-        //PhotonNetwork.JoinRandomRoom();
+        PhotonNetwork.JoinRandomRoom();
 
         // ルームの参加人数を2人に設定する
-        var roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
+        //var roomOptions = new RoomOptions();
+        //roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
 
         // "room"という名前のルームに参加する（ルームが無ければ作成してから参加する）
-        PhotonNetwork.JoinOrCreateRoom("neko", roomOptions, TypedLobby.Default);
+        //PhotonNetwork.JoinOrCreateRoom("neko", roomOptions, TypedLobby.Default);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         // ルームの参加人数を2人に設定する
-        //var roomOptions = new RoomOptions();
-        //roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
+        var roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
 
-        //PhotonNetwork.CreateRoom(null, roomOptions);
+        PhotonNetwork.CreateRoom(null, roomOptions);
     }
 
     //ルームに入室後にnullれる
