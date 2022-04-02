@@ -21,7 +21,7 @@ Shader "Custom/Ripple" {
 				"IgnoreProjector" = "True"
 				"PreviewType" = "Plane"
 			}
-
+			Cull Off
 			Lighting Off
 			ZWrite Off
 			Fog{ Mode Off }
@@ -77,6 +77,9 @@ Shader "Custom/Ripple" {
 				{
 					fixed4 color = tex2D(_MainTex, IN.texcoord)*_Color;
 					float2 pos = (IN.texcoord - float2(0.5,0.5)) * 2; //-1~1 •2
+
+					if (length(pos) > 1)return fixed4(0,0,0,0);
+
 					float dis = (fmod(_Time.y, _LoopTime) - _StartTime) / _AnimationTime + _StartWidth - length(pos);
 
 					if (dis < 0 || dis > _Width)
