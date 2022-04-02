@@ -5,6 +5,14 @@ public class CSceneChange : CSingletonMonoBehaviour<CSceneChange>
 {
     private string _nextSceneName = "";
     private bool _isSceneChange = false;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        DontDestroyOnLoad(gameObject);
+    }
+    
     public void GotoScene(string name)
     {
         if (!_isSceneChange)
@@ -23,6 +31,7 @@ public class CSceneChange : CSingletonMonoBehaviour<CSceneChange>
             if (FadeController.Instance.state == FadeController.FadeState.Black)
             {
                 SceneManager.LoadScene(_nextSceneName);
+                _isSceneChange = false;
             }
         }
     }
