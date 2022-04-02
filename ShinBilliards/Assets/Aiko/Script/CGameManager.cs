@@ -12,7 +12,8 @@ public class CGameManager : MonoBehaviourPunCallbacks
     private PlayerController _player;
     private List<CDebugBall> _cDebugBalls = new List<CDebugBall>();
     private CDebugMainBall _cDebugMainBall;
-    private CTimer _timer;
+
+    private GameObject _countDownCanvas;
 
     private bool _isInitialized = false;
 
@@ -95,63 +96,84 @@ public class CGameManager : MonoBehaviourPunCallbacks
                     _cueManager = cueMng;
                     continue;
                 }
-
-                // タイマー取得
-                if (_timer == null)
-                {
-                    CTimer timer = obj.GetComponent<CTimer>();
-                    if(timer != null)
-                    {
-                        _timer = timer;
-                    }
-                }
+                
             }
 
             _isInitialized = true;
         }
         _cueManager.Init();
-        FindObjectOfType<CCountDownUI>().Register(_timer);
     }
 
+    // マスタークライアントのみ呼ばれる
     public void StartGame()
     {
-        // カウントダウンタイマー生成
-        GameObject timer = PhotonNetwork.Instantiate("Timer", Vector3.zero, Quaternion.identity, 0);
-        _timer = timer.GetComponent<CTimer>();
-        _timer._onFinish.AddListener(GameTimeFinish);
-
-        photonView.RPC(nameof(StartGameRPC), RpcTarget.AllViaServer);
+        photonView.RPC(nameof(StartWaitRPC), RpcTarget.AllViaServer);
     }
-
+    
+    // スタート前カウントダウンスタート
     [PunRPC]
-    private void StartGameRPC()
+    private void StartWaitRPC()
     {
-        _state = State.BeachFlags;
+        _state = State.StartIdle;
 
         Init();
 
         if (PhotonNetwork.IsMasterClient)
         {
-            _cueManager.CreateCue(false);
+            // スタート用のカウントダウンタイマー生成
+            _countDownCanvas = PhotonNetwork.Instantiate("StartCountDownCanvas", Vector3.zero, Quaternion.identity, 0);
+            CTimer timerScript = _countDownCanvas.GetComponentInChildren<CTimer>();
+            timerScript.TimerStart();
+            timerScript._onFinish.AddListener(StartBattle);
         }
 
         SoundManager.Instance.PlayBGM("Game", true);
-        SoundManager.Instance.PlaySE("Start");
-
-        StartCoroutine(StartCountDown());
     }
 
-    private IEnumerator StartCountDown()
+    // マスタークライアントのみ
+    private void StartBattle()
     {
+        if (_state == State.Finish) return;
 
-        yield return new WaitForSeconds(3.0f);
+        Invoke("DestroyCountDown", 0.5f);
+
+        photonView.RPC(nameof(StartGameRPC), RpcTarget.AllViaServer);
+    }
+
+    void DestroyCountDown()
+    {
+        PhotonNetwork.Destroy(_countDownCanvas);
+    }
+
+    // バトルスタート
+    [PunRPC]
+    private void StartGameRPC()
+    {
+        _state = State.BeachFlags;
+        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            _cueManager.CreateCue(false);
+            // ゲーム用のカウントダウンタイマー生成
+            GameObject timer = PhotonNetwork.Instantiate("CountDownCanvas", Vector3.zero, Quaternion.identity, 0);
+            CTimer timerScript = timer.GetComponentInChildren<CTimer>();
+            timerScript.TimerStart();
+            timerScript._onFinish.AddListener(GameTimeFinish);
+        }
+        
+        SoundManager.Instance.PlaySE("Start");
+
+        RegisterMasterData();
+    }
 
 
+    private void RegisterMasterData()
+    {
         if (_state == State.Finish)
         {
             MasterData.Instance._myPlayerPrefabName = PhotonNetwork.LocalPlayer.GetPrefabName();
             MasterData.Instance._otherPlayerPrefabName = null;
-            yield break;
+            return;
         }
 
         foreach (Player player in PhotonNetwork.PlayerList)
@@ -169,6 +191,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
         }
 
         Debug.Log("my : " + MasterData.Instance._myPlayerPrefabName + "other : " + MasterData.Instance._otherPlayerPrefabName);
+        
     }
 
     /// <summary>
@@ -214,13 +237,12 @@ public class CGameManager : MonoBehaviourPunCallbacks
                     ball.ChangeOwner();
                 }
                 _cDebugMainBall.ChangeOwner();
-
-                SoundManager.Instance.PlaySE("Cue_Get");
             }
 
             _state = State.Fight;
 
             _cueManager.Cue().Take();
+            SoundManager.Instance.PlaySE("Cue_Get");
 
             foreach (CDebugBall ball in _cDebugBalls)
             {
@@ -361,7 +383,8 @@ public class CGameManager : MonoBehaviourPunCallbacks
         if (_state != State.Finish)
         {
             _state = State.Finish;
-            GameFinishRPC(true);
+            Time.timeScale = 1.0f;
+            //GameFinishRPC(true);
         }
     }
 
@@ -398,15 +421,25 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
         FindObjectOfType<CResultCanvas>().SetWinLose(MasterData.Instance._myPlayerWin);    //TODO
 
-        //Time.timeScale = 0.0f;  //TODO
+        Time.timeScale = 0.0f;
 
-        Invoke("GoToResult", 2.0f);
+        StartCoroutine(GotoResult());
 
     }
 
-    private void GoToResult()
+    IEnumerator GotoResult()
     {
-        Time.timeScale = 1.0f;  //TODO
+        yield return new WaitForSecondsRealtime(2.0f);
+
+        Time.timeScale = 1.0f;
+        SoundManager.Instance.StopBGM();
         UnityEngine.SceneManagement.SceneManager.LoadScene("ResultScene");
+
     }
+
+    private void OnDestroy()
+    {
+        Time.timeScale = 1.0f;
+    }
+
 }

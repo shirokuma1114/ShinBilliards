@@ -7,10 +7,18 @@ public class BillBoard : MonoBehaviour
     [SerializeField]
     private Transform target;
 
+    private void Start()
+    {
+        target = Camera.main.transform;
+    }
+
     void Update()
     {
-        Vector3 pos = target.position;
-        pos.y = transform.position.y;
-        transform.LookAt(pos);
+        if(gameObject.activeSelf)
+        {
+            Vector3 pos = target.position;
+            pos.y = transform.position.y;
+            transform.LookAt(pos);
+        }
     }
 }

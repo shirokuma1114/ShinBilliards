@@ -10,6 +10,9 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
 
     CPredictionLine _predictionLine = null;
 
+    [SerializeField]
+    private GameObject _effect = null;
+
     void Start()
     {
         _offsetPos = transform.position;
@@ -86,6 +89,7 @@ public class CDebugMainBall : MonoBehaviourPunCallbacks, ITouche
             if (collision.gameObject.layer == LayerMask.NameToLayer("Ball"))
             {
                 SoundManager.Instance.PlaySE("Ball_Collide", false, force);
+                Instantiate(_effect, collision.GetContact(0).point, Quaternion.identity);
             }
             else
             {

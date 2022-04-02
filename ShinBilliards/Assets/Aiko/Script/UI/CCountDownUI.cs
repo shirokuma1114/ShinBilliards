@@ -22,7 +22,15 @@ public class CCountDownUI : MonoBehaviour
         if(time != _time)
         {
             _time = time;
-            _countDownText.text = time.ToString();
+
+            //•ª•ÏŠ·
+            int minit = time / 60;
+            int second = time % 60;
+
+            if (second < 10)
+                _countDownText.text = minit.ToString() + ":0" + second.ToString();
+            else
+                _countDownText.text = minit.ToString() + ":" + second.ToString();
 
             if(time < 10)
             {
