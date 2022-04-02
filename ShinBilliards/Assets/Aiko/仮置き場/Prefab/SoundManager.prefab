@@ -72,7 +72,7 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: c57ddc6a1f97aa446814f2bf3bdf0746, type: 3}
   - name: DrumRoll
     audioClip: {fileID: 8300000, guid: 919dd23ff8c35404ba10569dc1747447, type: 3}
-  - name: DrumEnd
+  - name: RollEnd
     audioClip: {fileID: 8300000, guid: 017b8192fff1ed6458cf2d89fa4ed7d6, type: 3}
   _maxVolume: 1
   _fadeTime: 0.5

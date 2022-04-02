@@ -95,9 +95,15 @@ public class ResultSceneManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         //ƒhƒ‰ƒ€ƒ[ƒ‹
-        //SoundManager.Instance.PlaySE("DrumRoll",false,1);
+        SoundManager.Instance.PlaySE("DrumRoll", false, 1);
         //3•b’â~
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4.3f);
+
+        SoundManager.Instance.StopSE("DrumRoll");
+
+        //yield return new WaitForSeconds(1.0f);
+
+        SoundManager.Instance.PlaySE("RollEnd");
 
         Result();
      }
@@ -126,8 +132,6 @@ public class ResultSceneManager : MonoBehaviour
         otherScore.enabled = true;
 
         inputEnable = true;
-
-        SoundManager.Instance.PlaySE("DrumRoll", false, 1);
 
     }
 }

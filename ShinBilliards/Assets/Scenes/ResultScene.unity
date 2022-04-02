@@ -980,6 +980,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4972316634205018095, guid: f12416529d962474896443d32b4c6582, type: 3}
+      propertyPath: _setSE.Array.data[12].name
+      value: RollEnd
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f12416529d962474896443d32b4c6582, type: 3}
 --- !u!1 &1777635463
