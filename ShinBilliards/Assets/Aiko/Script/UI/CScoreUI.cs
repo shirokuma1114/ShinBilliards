@@ -9,6 +9,8 @@ public class CScoreUI : CSingletonMonoBehaviour<CScoreUI>
 {
     [SerializeField] private Text _scoreTextRight;
     [SerializeField] private Text _scoreTextLeft;
+    [SerializeField] private Text _nameTextRight;
+    [SerializeField] private Text _nameTextLeft;
 
     private CPlayerScore[] _playerScores = new CPlayerScore[2];
     
@@ -27,16 +29,20 @@ public class CScoreUI : CSingletonMonoBehaviour<CScoreUI>
         
     }
 
-    public void RegisterRight(CPlayerScore score)
+    public void RegisterRight(CPlayerScore score, string name)
     {
         _playerScores[0] = score;
         _playerScores[0]._onChanged.AddListener(UpdateScoreTextRight);
+
+        _nameTextRight.text = name;
     }
 
-    public void RegisterLeft(CPlayerScore score)
+    public void RegisterLeft(CPlayerScore score, string name)
     {
         _playerScores[1] = score;
         _playerScores[1]._onChanged.AddListener(UpdateScoreTextLeft);
+
+        _nameTextLeft.text = name;
     }
 
     void UpdateScoreTextRight()

@@ -27,11 +27,11 @@ public class CPlayerScore : MonoBehaviourPunCallbacks, IPunObservable
         
         if (photonView.IsMine)
         {
-            CScoreUI.Instance.RegisterRight(this);
+            CScoreUI.Instance.RegisterRight(this, photonView.Owner.NickName);
         }
         else
         {
-            CScoreUI.Instance.RegisterLeft(this);
+            CScoreUI.Instance.RegisterLeft(this, photonView.Owner.NickName);
         }
         
     }
