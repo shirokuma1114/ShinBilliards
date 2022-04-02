@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 
 public class CNetworkObjectManager : MonoBehaviourPunCallbacks
 {
@@ -19,6 +20,14 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
         Player_Boy_1 = 2,
         Player_Boy_2 = 3,
         PrefabCount,
+    }
+
+    public enum PlayerName
+    {
+        Amelia = 0,
+        Luna,
+        Michael,
+        Johnny,
     }
 
     public void CreateRoomObj()
@@ -44,24 +53,38 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
 
     public void CreatePlayer(int num)
     {
-        //キャラクターを生成
-        GameObject player;
+        string playerName = null;
+
+        foreach (Player playerlist in PhotonNetwork.PlayerList)
+        {
+            if (!playerlist.IsLocal)
+            {
+                // 名前取得する
+                playerName = playerlist.GetPrefabName();
+            }
+        }
 
         while (true)
         {
-            PlayerPrefabList number = (PlayerPrefabList)Random.Range(0, (int)PlayerPrefabList.PrefabCount - 1);
+            PlayerPrefabList number = (PlayerPrefabList)UnityEngine.Random.Range(0, (int)PlayerPrefabList.PrefabCount - 1);
 
-            Debug.Log(number.ToString());
-            if (GameObject.Find(number.ToString()) == null)
+            //Debug.Log(number.ToString());
+            if (playerName != number.ToString())
             {
                 //キャラクターを生成
+                GameObject player;
+
+                //キャラクターを生成
                 player = PhotonNetwork.Instantiate(number.ToString(), new Vector3(-1.0f + (num - 1) * 3.0f, 0, -12.0f), Quaternion.identity, 0);
+
                 //自分だけが操作できるようにスクリプトを有効にする
                 PlayerController playerScript = player.GetComponent<PlayerController>();
                 playerScript.enabled = true;
 
                 PhotonNetwork.LocalPlayer.SetPrefabName(number.ToString());
-                PhotonNetwork.LocalPlayer.NickName = number.ToString();
+                //PhotonNetwork.LocalPlayer.NickName = number.ToString();
+                PhotonNetwork.LocalPlayer.NickName = Enum.ToObject(typeof(PlayerName), (int)number).ToString();
+                player.name = number.ToString();
                 break;
             }
         }
