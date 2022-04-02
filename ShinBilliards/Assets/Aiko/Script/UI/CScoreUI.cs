@@ -47,12 +47,12 @@ public class CScoreUI : CSingletonMonoBehaviour<CScoreUI>
 
     void UpdateScoreTextRight()
     {
-        _scoreTextRight.text = _playerScores[0].Score.ToString();
+        _scoreTextRight.text = _playerScores[0].Score.ToString("D2");
     }
 
     void UpdateScoreTextLeft()
     {
-        _scoreTextLeft.text = _playerScores[1].Score.ToString();
+        _scoreTextLeft.text = _playerScores[1].Score.ToString("D2");
     }
 
 }
