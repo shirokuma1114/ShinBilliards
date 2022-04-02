@@ -168,6 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 3
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &1645781817107626186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -459,6 +460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 5
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &6218952222844445555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -750,6 +752,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 7
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &2717750011229819778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1081,6 +1084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 4
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &4781993297769356144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1372,6 +1376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 6
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &5755402269988128143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1663,6 +1668,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 2
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &6672810802903362011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1954,6 +1960,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 1
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &6223722729034881653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2245,6 +2252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 8
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &5917427663397070890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2536,6 +2544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _num: 9
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &4209195555897602818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2827,6 +2836,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a1969ed649e147428954cd5c21c9349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _effect: {fileID: 7656964145326741725, guid: 4c6642268fcbfe84697fe4d61a2eac85, type: 3}
 --- !u!114 &1110116890964173681
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -58,8 +58,10 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: e3c06b1190535114fa800facc055e15d, type: 3}
   - name: Cue_Get
     audioClip: {fileID: 8300000, guid: 3c6347b6a568d5a4aa487dcead6a4eba, type: 3}
-  - name: Cue_Shot
-    audioClip: {fileID: 8300000, guid: b601c288bde3cc04eb98356f3546a989, type: 3}
+  - name: Cue_Appearance
+    audioClip: {fileID: 8300000, guid: 4430b78943dc3f741b65b4eafdea27a6, type: 3}
+  - name: Cue_Charge
+    audioClip: {fileID: 8300000, guid: 687d683a9cd6a034eb5f007fb053484a, type: 3}
   - name: Ball_Collide
     audioClip: {fileID: 8300000, guid: 2dd3901b63f30be4c92dbadec0a20edc, type: 3}
   - name: Ball_Goal
@@ -68,8 +70,6 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: 8e5321652a0752848ace5ae79868e745, type: 3}
   - name: Button_Down
     audioClip: {fileID: 8300000, guid: c57ddc6a1f97aa446814f2bf3bdf0746, type: 3}
-  - name: Cue_Appearance
-    audioClip: {fileID: 8300000, guid: 4430b78943dc3f741b65b4eafdea27a6, type: 3}
   _maxVolume: 1
   _fadeTime: 0.5
 --- !u!82 &1381616724494873517

@@ -9,6 +9,9 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
     private bool _isGoal = false;
     private bool _isStart = false;  // ビリヤードがスタートしているか
 
+    [SerializeField]
+    private GameObject _effect = null;
+
 
     public int Get_num()
     {
@@ -61,6 +64,7 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
                 if (photonView.AmOwner)
                 {
                     photonView.RPC(nameof(Ball_CollideSoundRPC), RpcTarget.All, force);
+                    photonView.RPC(nameof(Ball_CollideEffectRPC), RpcTarget.All, collision.GetContact(0).point);
                 }
                 //SoundManager.Instance.PlaySE("Ball_Collide", false, force);
             }
@@ -78,6 +82,12 @@ public class CDebugBall : MonoBehaviourPunCallbacks//, ITouche
         SoundManager.Instance.PlaySE("Ball_Collide", false, force);
     }
 
+    // ボールがぶつかった時のエフェクト
+    [PunRPC]
+    private void Ball_CollideEffectRPC(Vector3 pos)
+    {
+        Instantiate(_effect, pos, Quaternion.identity);
+    }
 
     public void MoveStop()
     {
