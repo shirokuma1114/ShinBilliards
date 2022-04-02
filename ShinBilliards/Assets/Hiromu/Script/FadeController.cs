@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FadeController : MonoBehaviour
+public class FadeController : CSingletonMonoBehaviour<FadeController>
 {
     public enum FadeState
     {
@@ -18,13 +18,16 @@ public class FadeController : MonoBehaviour
     private Color color;
     [SerializeField] float FadeSpeed;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
+        DontDestroyOnLoad(transform.parent.gameObject);
+
         FadeImage = gameObject.GetComponent<Image>();
         color = FadeImage.color;
 
         state = FadeState.Normal;
-        FadeInStart();
     }
 
     public void FadeInStart()

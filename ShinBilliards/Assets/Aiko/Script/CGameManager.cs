@@ -429,11 +429,11 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
     IEnumerator GotoResult()
     {
-        yield return new WaitForSecondsRealtime(2.0f);
+        yield return new WaitForSecondsRealtime(1.5f);
 
         Time.timeScale = 1.0f;
         SoundManager.Instance.StopBGM();
-        UnityEngine.SceneManagement.SceneManager.LoadScene("ResultScene");
+        CSceneChange.Instance.GotoScene("ResultScene");
 
     }
 

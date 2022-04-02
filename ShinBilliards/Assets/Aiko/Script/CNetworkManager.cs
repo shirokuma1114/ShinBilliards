@@ -86,6 +86,7 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.IsOpen = false;
         }
 
+        FadeController.Instance.FadeInStart();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
