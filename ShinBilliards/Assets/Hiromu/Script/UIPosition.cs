@@ -20,4 +20,12 @@ public class UIPosition : MonoBehaviour
         myRectTfm.position
             = RectTransformUtility.WorldToScreenPoint(Camera.main, targetTfm.position + offset);
     }
+
+    public void SetTarget(Transform target)
+    {
+        targetTfm = target;
+        myRectTfm = GetComponent<RectTransform>();
+        myRectTfm.position
+            = RectTransformUtility.WorldToScreenPoint(Camera.main, targetTfm.position + offset);
+    }
 }

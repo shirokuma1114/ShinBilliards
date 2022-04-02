@@ -28,6 +28,12 @@ public class CStick : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject _effect = null;
 
+    [SerializeField]
+    private UIPosition[] _uiPos = null;
+    [SerializeField]
+    private ChargeUI _chargeUI = null;
+
+    private bool _isPlaySE = false;
     
 
     enum State
@@ -53,6 +59,7 @@ public class CStick : MonoBehaviourPunCallbacks
         _state = State.Placed;
 
         SoundManager.Instance.PlaySE("Cue_Appearance");
+
     }
 
     private void Update()
@@ -61,6 +68,7 @@ public class CStick : MonoBehaviourPunCallbacks
 
         if (_state == State.Placed) return;
 
+        CCueHaveEffect.Instance.transform.position = new Vector3(transform.parent.position.x, 0.01f, transform.parent.position.z);
 
         // キューの位置を調整する
         {
@@ -159,6 +167,14 @@ public class CStick : MonoBehaviourPunCallbacks
 
         _state = State.Charge;
         _pull = late;
+        _chargeUI.transform.parent.gameObject.SetActive(true);
+        _chargeUI.SetCharge(late, 1.0f);
+
+        if (!_isPlaySE)
+        {
+            SoundManager.Instance.PlaySE("Cue_Charge", true);
+            _isPlaySE = true;
+        }
         //transform.localPosition = Vector3.Lerp(_offset, _offset - Vector3.forward, late);
         //transform.position = player.transform.position + (power * -(player.transform.rotation * Vector3.forward));
         //transform.localPosition = new Vector3(0.5f, 1, 0) + (power * (player.transform.rotation * new Vector3(-1, 0, 0)));
@@ -172,10 +188,16 @@ public class CStick : MonoBehaviourPunCallbacks
         _state = State.Shot;
         _pull = currentCharge / 2.0f; // 仮
         _charge = _pull;
+        _chargeUI.transform.parent.gameObject.SetActive(false);
+        if (_isPlaySE)
+        {
+            SoundManager.Instance.StopSE("Cue_Charge");
+            _isPlaySE = false;
+        }
         //if (_collider == null) _collider = GetComponent<Collider>();
         //_collider.enabled = true;
         //transform.localPosition = _offset;
-        
+
         //StartCoroutine("ShotAnim");
     }
 
@@ -191,6 +213,12 @@ public class CStick : MonoBehaviourPunCallbacks
         transform.parent = player.transform;
         transform.localPosition = _offsetPos;
         transform.localRotation = Quaternion.Euler(_offsetRot);
+
+        CCueHaveEffect.Instance.ChangeOwner();
+        foreach(UIPosition ui in _uiPos)
+        {
+            ui.SetTarget(player.transform);
+        }
     }
 
     // キュー取得済み
@@ -199,6 +227,7 @@ public class CStick : MonoBehaviourPunCallbacks
         if (_collider == null) _collider = GetComponent<Collider>();
         _collider.enabled = false;
         _effect.SetActive(false);
+        CCueHaveEffect.Instance.SetActive(true);
     }
 
     // キュー落とす
@@ -218,11 +247,25 @@ public class CStick : MonoBehaviourPunCallbacks
         if (_collider == null) _collider = GetComponent<Collider>();
         _collider.enabled = true;
         _effect.SetActive(true);
+        CCueHaveEffect.Instance.SetActive(false);
+        _chargeUI.transform.parent.gameObject.SetActive(false);
+        if (_isPlaySE)
+        {
+            SoundManager.Instance.StopSE("Cue_Charge");
+            _isPlaySE = false;
+        }
     }
 
     // キュー消える
     public void Destroy()
     {
+        CCueHaveEffect.Instance.SetActive(false);
+        if (_isPlaySE)
+        {
+            SoundManager.Instance.StopSE("Cue_Charge");
+            _isPlaySE = false;
+        }
+
         if (!photonView.IsMine) return;
 
         PhotonNetwork.Destroy(gameObject);

@@ -23,7 +23,6 @@ public class ChargeUI : MonoBehaviour
 
     void Update()
     {
-        SetCharge(num, 100f);
     }
 
     public void SetCharge(float charge,float max)

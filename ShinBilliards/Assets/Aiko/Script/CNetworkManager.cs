@@ -16,6 +16,12 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private GameObject _disconnectCanvas = null;
 
+    [SerializeField]
+    private bool _isRandomMatch = false;
+
+    [SerializeField]
+    private string _roomName = "neko";
+
     void Start()
     {
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
@@ -32,24 +38,32 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     //ルームに入室前に呼び出される
     public override void OnConnectedToMaster()
     {
-        // ランダムなルームに参加
-        PhotonNetwork.JoinRandomRoom();
+        if (_isRandomMatch)
+        {
+            // ランダムなルームに参加
+            PhotonNetwork.JoinRandomRoom();
+        }
+        else
+        {
+            //ルームの参加人数を2人に設定する
+            var roomOptions = new RoomOptions();
+            roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
 
-        // ルームの参加人数を2人に設定する
-        //var roomOptions = new RoomOptions();
-        //roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
-
-        // "room"という名前のルームに参加する（ルームが無ければ作成してから参加する）
-        //PhotonNetwork.JoinOrCreateRoom("neko", roomOptions, TypedLobby.Default);
+            //_roomNameという名前のルームに参加する（ルームが無ければ作成してから参加する）
+            PhotonNetwork.JoinOrCreateRoom(_roomName, roomOptions, TypedLobby.Default);
+        }
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        // ルームの参加人数を2人に設定する
-        var roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
+        if (_isRandomMatch)
+        {
+            // ルームの参加人数を2人に設定する
+            var roomOptions = new RoomOptions();
+            roomOptions.MaxPlayers = (byte)MAX_PLAYER_NUM;
 
-        PhotonNetwork.CreateRoom(null, roomOptions);
+            PhotonNetwork.CreateRoom(null, roomOptions);
+        }
     }
 
     //ルームに入室後にnullれる
@@ -88,8 +102,20 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
 
         Time.timeScale = 0.0f;
         //タイトルに戻る
-        _disconnectCanvas.SetActive(true);
+        if (_disconnectCanvas != null)
+        {
+            _disconnectCanvas.SetActive(true);
+        }
 
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        //タイトルに戻る
+        if (_disconnectCanvas != null)
+        {
+            _disconnectCanvas.SetActive(true);
+        }
     }
 
 }
