@@ -32,7 +32,7 @@ public class FadeController : CSingletonMonoBehaviour<FadeController>
 
     public void FadeInStart()
     {
-        if (state == FadeState.FadeIn) return;
+        if (state == FadeState.FadeIn|| state == FadeState.FadeOut) return;
         state = FadeState.FadeIn;
 
         StartCoroutine(FadeIn());
@@ -40,7 +40,7 @@ public class FadeController : CSingletonMonoBehaviour<FadeController>
 
     public void FadeOutStart()
     {
-        if (state == FadeState.FadeOut) return;
+        if (state == FadeState.FadeOut|| state == FadeState.FadeIn) return;
         state = FadeState.FadeOut;
 
         StartCoroutine(FadeOut());
