@@ -13,7 +13,7 @@ public class FadeController : MonoBehaviour
         Normal
     }
 
-    public FadeState _state;
+    public FadeState state;
     private Image FadeImage;
     private Color color;
     [SerializeField] float FadeSpeed;
@@ -23,22 +23,22 @@ public class FadeController : MonoBehaviour
         FadeImage = gameObject.GetComponent<Image>();
         color = FadeImage.color;
 
-        _state = FadeState.Normal;
+        state = FadeState.Normal;
         FadeInStart();
     }
 
     public void FadeInStart()
     {
-        if (_state == FadeState.FadeIn) return;
-        _state = FadeState.FadeIn;
+        if (state == FadeState.FadeIn) return;
+        state = FadeState.FadeIn;
 
         StartCoroutine(FadeIn());
     }
 
     public void FadeOutStart()
     {
-        if (_state == FadeState.FadeOut) return;
-        _state = FadeState.FadeOut;
+        if (state == FadeState.FadeOut) return;
+        state = FadeState.FadeOut;
 
         StartCoroutine(FadeOut());
     }
@@ -53,7 +53,7 @@ public class FadeController : MonoBehaviour
             FadeImage.color = color;
             yield return null;
         }
-        _state = FadeState.Normal;
+        state = FadeState.Normal;
     }
 
     IEnumerator FadeOut()
@@ -66,6 +66,6 @@ public class FadeController : MonoBehaviour
             FadeImage.color = color;
             yield return null;
         }
-        _state = FadeState.Black;
+        state = FadeState.Black;
     }
 }
