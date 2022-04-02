@@ -48,6 +48,8 @@ public class ResultSceneManager : MonoBehaviour
         resultText.enabled = false;
         playerScore.enabled = false;
         otherScore.enabled = false;
+
+        FadeController.Instance.FadeInStart();
     }
 
     string GetResultPrefabName(string prefabName)
@@ -86,7 +88,7 @@ public class ResultSceneManager : MonoBehaviour
             if(Input.GetMouseButtonDown(0))
             {
                 //タイトルシーン遷移
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Title");
+                CSceneChange.Instance.GotoScene("Title");
             }
         }
     }
