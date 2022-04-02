@@ -5,17 +5,21 @@ using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
 {
-    [SerializeField] FadeController fadeController;
+
+    private void Start()
+    {
+        FadeController.Instance.FadeInStart();
+    }
 
     void Update()
     {
         // エンターキーで処理実行
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            fadeController.FadeOutStart();
+            FadeController.Instance.FadeOutStart();
         }
 
-        if(fadeController.state == FadeController.FadeState.Black)
+        if(FadeController.Instance.state == FadeController.FadeState.Black)
         SceneManager.LoadScene("Game");
 
     }

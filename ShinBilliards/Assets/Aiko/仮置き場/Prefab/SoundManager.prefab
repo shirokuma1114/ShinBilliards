@@ -47,6 +47,10 @@ MonoBehaviour:
   _setBGM:
   - name: Game
     audioClip: {fileID: 8300000, guid: 53e10749f4a9cd4459086866150c4aeb, type: 3}
+  - name: Wait
+    audioClip: {fileID: 8300000, guid: d34593b2e0f4dee4ca4b293d7119fcd4, type: 3}
+  - name: Title
+    audioClip: {fileID: 8300000, guid: 95c9e5f55b035a0489762c50f1b367e5, type: 3}
   _setSE:
   - name: Start
     audioClip: {fileID: 8300000, guid: 37152d9dc8f845546b33431d56f7d6f2, type: 3}
@@ -74,6 +78,8 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: 919dd23ff8c35404ba10569dc1747447, type: 3}
   - name: RollEnd
     audioClip: {fileID: 8300000, guid: 017b8192fff1ed6458cf2d89fa4ed7d6, type: 3}
+  - name: Cue_Shot
+    audioClip: {fileID: 8300000, guid: b601c288bde3cc04eb98356f3546a989, type: 3}
   _maxVolume: 1
   _fadeTime: 0.5
 --- !u!82 &1381616724494873517

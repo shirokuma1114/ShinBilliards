@@ -17,6 +17,9 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     private GameObject _disconnectCanvas = null;
 
     [SerializeField]
+    private GameObject _otherDisconnectCanvas = null;
+
+    [SerializeField]
     private bool _isRandomMatch = false;
 
     [SerializeField]
@@ -26,6 +29,8 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     {
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
         PhotonNetwork.ConnectUsingSettings();
+
+        SoundManager.Instance.PlayBGM("Wait", true);
     }
 
     void OnGUI()
@@ -81,6 +86,7 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.IsOpen = false;
         }
 
+        FadeController.Instance.FadeInStart();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -112,9 +118,9 @@ public class CNetworkManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         //タイトルに戻る
-        if (_disconnectCanvas != null)
+        if (_otherDisconnectCanvas != null)
         {
-            _disconnectCanvas.SetActive(true);
+            _otherDisconnectCanvas.SetActive(true);
         }
     }
 

@@ -383,7 +383,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
         if (_state != State.Finish)
         {
             _state = State.Finish;
-            Time.timeScale = 1.0f;
+            Time.timeScale = 0.0f;
             //GameFinishRPC(true);
         }
     }
@@ -429,11 +429,11 @@ public class CGameManager : MonoBehaviourPunCallbacks
 
     IEnumerator GotoResult()
     {
-        yield return new WaitForSecondsRealtime(2.0f);
+        yield return new WaitForSecondsRealtime(1.5f);
 
         Time.timeScale = 1.0f;
         SoundManager.Instance.StopBGM();
-        UnityEngine.SceneManagement.SceneManager.LoadScene("ResultScene");
+        CSceneChange.Instance.GotoScene("ResultScene");
 
     }
 
