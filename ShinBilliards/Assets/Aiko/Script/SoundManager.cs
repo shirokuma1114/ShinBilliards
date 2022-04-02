@@ -25,7 +25,8 @@ public class SoundManager : CSingletonMonoBehaviour<SoundManager>
 
     // AudioSource
     private AudioSource _asBGM;// BGM用のAudioSource
-    private Dictionary<string, AudioSource> _asSE = new Dictionary<string, AudioSource>();    // SE再生用の個別AudioSource
+    private AudioSource _asSE;// SE単体プレイ用のAudioSource
+    private Dictionary<string, AudioSource> _asSEs = new Dictionary<string, AudioSource>();    // SE再生用の個別AudioSource
 
     // 音量関係
     [SerializeField, Range(0, 1)]
@@ -53,12 +54,18 @@ public class SoundManager : CSingletonMonoBehaviour<SoundManager>
         }
 
         // BGM用のAudioSourceをセット
-        _asBGM = GetComponent<AudioSource>();
         if(_asBGM == null)
         {
             _asBGM = gameObject.AddComponent<AudioSource>();
         }
         _asBGM.volume = _maxVolume;
+
+        // SE用のAudioSourceをセット
+        if (_asSE == null)
+        {
+            _asSE = gameObject.AddComponent<AudioSource>();
+        }
+        _asSE.volume = _maxVolume;
 
         DontDestroyOnLoad(gameObject);
     }
@@ -74,26 +81,26 @@ public class SoundManager : CSingletonMonoBehaviour<SoundManager>
 
         if (loop)
         {
-            if (!_asSE.ContainsKey(name) || _asSE[name] == null)
+            if (!_asSEs.ContainsKey(name) || _asSEs[name] == null)
             {
                 // AudioSourceを生成
-                _asSE[name] = _asBGM.gameObject.AddComponent<AudioSource>();
+                _asSEs[name] = gameObject.AddComponent<AudioSource>();
 
-                _asSE[name].clip = _se[name].audioClip;// clipにbgmを代入
-                _asSE[name].loop = loop;// ループするか
-                _asSE[name].volume = _maxVolume * volumeScale;
-                _asSE[name].Play();// 再生
+                _asSEs[name].clip = _se[name].audioClip;// clipにbgmを代入
+                _asSEs[name].loop = loop;// ループするか
+                _asSEs[name].volume = _maxVolume * volumeScale;
+                _asSEs[name].Play();// 再生
             }
             else
             {// 既に生成済み
-                _asSE[name].Play();// 再再生
+                _asSEs[name].Play();// 再再生
             }
         }
         else
         {
-            if (_asBGM != null)     // BGMのAudioSourceを借りてPlayOneShotする
+            if (_asSE != null)     // PlayOneShotする
             {
-                _asBGM.PlayOneShot(_se[name].audioClip, volumeScale);//再生
+                _asSE.PlayOneShot(_se[name].audioClip, volumeScale);//再生
             }
         }
 
@@ -103,11 +110,11 @@ public class SoundManager : CSingletonMonoBehaviour<SoundManager>
     public void StopSE(string name)
     {
         // 存在したら消す
-        if (_asSE.ContainsKey(name) && _asSE[name] != null)
+        if (_asSEs.ContainsKey(name) && _asSEs[name] != null)
         {
-            _asSE[name].Stop();//停止
-            Destroy(_asSE[name]);
-            _asSE.Remove(name);
+            _asSEs[name].Stop();//停止
+            Destroy(_asSEs[name]);
+            _asSEs.Remove(name);
         }
     }
 
