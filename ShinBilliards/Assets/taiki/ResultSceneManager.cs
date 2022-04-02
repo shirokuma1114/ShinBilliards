@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ResultSceneManager : MonoBehaviour
 {
-    [SerializeField] private GameObject chara1, chara2;
+    //[SerializeField] private GameObject chara1, chara2;
 
     private bool winner = true;//true=>自分の勝利、false=>相手の勝利
 
@@ -52,15 +52,25 @@ public class ResultSceneManager : MonoBehaviour
 
     string GetResultPrefabName(string prefabName)
     {
-        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Boy_1.ToString() || prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Boy_2.ToString())
+        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Boy_1.ToString())
         {
             return "ResultBoy";
         }
+        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Boy_2.ToString())
+        {
+            return "ResultBoy2";
+        }
 
-        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Girl_1.ToString() || prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Girl_2.ToString())
+        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Girl_1.ToString())
         {
             return "ResultGirl";
         }
+
+        if (prefabName == CNetworkObjectManager.PlayerPrefabList.Player_Girl_2.ToString())
+        {
+            return "ResultGirl2";
+        }
+
         return null;
     }
 
@@ -83,10 +93,17 @@ public class ResultSceneManager : MonoBehaviour
 
     private IEnumerator Waiting()
     {
-        //ドラムロール的な音があっても良い
- 
+        yield return new WaitForSeconds(0.5f);
+        //ドラムロール
+        SoundManager.Instance.PlaySE("DrumRoll", false, 1);
         //3秒停止
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4.3f);
+
+        SoundManager.Instance.StopSE("DrumRoll");
+
+        //yield return new WaitForSeconds(1.0f);
+
+        SoundManager.Instance.PlaySE("RollEnd");
 
         Result();
      }
@@ -115,5 +132,6 @@ public class ResultSceneManager : MonoBehaviour
         otherScore.enabled = true;
 
         inputEnable = true;
+
     }
 }
