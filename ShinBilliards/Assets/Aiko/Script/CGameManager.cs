@@ -383,7 +383,7 @@ public class CGameManager : MonoBehaviourPunCallbacks
         if (_state != State.Finish)
         {
             _state = State.Finish;
-            Time.timeScale = 1.0f;
+            Time.timeScale = 0.0f;
             //GameFinishRPC(true);
         }
     }
