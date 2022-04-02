@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     //[SerializeField] KeyCode leftKey = KeyCode.LeftArrow;
     //[SerializeField] KeyCode attackKey = KeyCode.Return;
 
-
+    private string PlayerName;
 
     [SerializeField]private Vector3 tableCameraPos = new Vector3(0, 10.0f, 0);
     [SerializeField]private Vector3 tableCameraRot = new Vector3(90, 0, 0);
@@ -83,6 +84,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     }
 
 
+    [SerializeField] private GameObject piyopiyo;
+
     private void Awake()
     {
         //cueObject = GameObject.FindGameObjectWithTag("Cue");
@@ -97,6 +100,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         _score = GetComponent<CPlayerScore>();
 
         _rb = GetComponent<Rigidbody>();
+
+        piyopiyo.SetActive(false);
     }
 
     private void Start()
@@ -245,16 +250,15 @@ public class PlayerController : MonoBehaviourPunCallbacks
             {
                 CGameManager.Instance.LostCue();
             }
-            //photonView.RPC(nameof(CueRelease), RpcTarget.All);
             down = true;
             cueUse = false;
             hp = 100;
 
             animator.SetBool("Knockdown",true);
             animator.SetBool("GetUp",false);
-            //_rb.constraints = RigidbodyConstraints.FreezePosition;
-            //_rb.constraints = RigidbodyConstraints.FreezeRotation;
             _rb.isKinematic = true;
+
+            StartCoroutine("CreatePiyo");
         }
         else if (down)
         {
@@ -265,6 +269,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 animator.SetBool("Knockdown", false);
                 animator.SetBool("GetUp", true);
 
+                photonView.RPC(nameof(FlashDown), RpcTarget.All);
+
+
                 getup = true;
             }
             else if (downCurrentTime >= downTime)
@@ -272,12 +279,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 down = false;
                 downCurrentTime = 0;
                 getup = false;
-
-                //_rb.constraints = RigidbodyConstraints.None;
-                //_rb.constraints = RigidbodyConstraints.FreezeRotation;
-                //_rb.constraints = RigidbodyConstraints.FreezePositionY;
-                //Vector3 rot = transform.rotation.eulerAngles;
-                //transform.rotation = Quaternion.Euler(0, rot.y, 0);
+                animator.SetBool("GetUp", false);
                 _rb.isKinematic = false;
 
             }
@@ -347,15 +349,35 @@ public class PlayerController : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
+    private void FlashDown()
+    {
+        bool active = piyopiyo.activeSelf;
+
+        piyopiyo.SetActive(!active);
+    }
+
+    IEnumerator CreatePiyo()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        photonView.RPC(nameof(FlashDown), RpcTarget.All);
+
+        yield return null;
+    }
+
+
+    [PunRPC]
     private void AttackRPC()
     {
-        otherPlayer.GetComponent<PlayerController>().hp -= attackPoint;
+        if(otherPlayer != null)
+            otherPlayer.GetComponent<PlayerController>().hp -= attackPoint;
     }
 
     [PunRPC]
     private void CueAttackRPC()
     {
-        otherPlayer.GetComponent<PlayerController>().hp -= attackCuePoint;
+        if (otherPlayer != null)
+            otherPlayer.GetComponent<PlayerController>().hp -= attackCuePoint;
     }
 
     [PunRPC]
