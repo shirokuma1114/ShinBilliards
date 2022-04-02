@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/ResultScene.unity
     guid: 19e2033b0624a5b4e81fbcce2b8ecaab
   - enabled: 1
-    path: Assets/Scenes/Title.unity
-    guid: 6674498c616ed0f4c85ff5798ea299b0
+    path: Assets/Hiromu/scene/Title.unity
+    guid: 9aba66a2dc0a743419ec9b35d0c54d15
   m_configObjects: {}

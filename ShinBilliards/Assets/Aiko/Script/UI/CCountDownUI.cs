@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class CCountDownUI : MonoBehaviour
 {
     [SerializeField] private Text _countDownText;
-    private CTimer _timer;
+    [SerializeField] private CTimer _timer;
     private int _time = -1;
 
     public void Register(CTimer timer)
