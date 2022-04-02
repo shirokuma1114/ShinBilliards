@@ -35,18 +35,20 @@ public class CNetworkObjectManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             // ゲームマネージャー生成
-            GameObject gameManager = PhotonNetwork.Instantiate("GameManager", Vector3.zero, Quaternion.identity, 0);
+            GameObject gameManager = PhotonNetwork.InstantiateRoomObject("GameManager", Vector3.zero, Quaternion.identity, 0);
             _gameManager = gameManager.GetComponent<CGameManager>();
 
             // ボール生成
-            GameObject ball = PhotonNetwork.Instantiate("Balls", Vector3.zero, Quaternion.identity, 0);
+            GameObject ball = PhotonNetwork.InstantiateRoomObject("Balls", Vector3.zero, Quaternion.identity, 0);
             //_balls = ball.GetComponentsInChildren<CDebugBall>();
             //_mainBall = ball.GetComponentInChildren<CDebugMainBall>();
 
             // キューマネージャー生成
-            GameObject cueMng = PhotonNetwork.Instantiate("CueManager", Vector3.zero, Quaternion.identity, 0);
+            GameObject cueMng = PhotonNetwork.InstantiateRoomObject("CueManager", Vector3.zero, Quaternion.identity, 0);
             //_cueMng = cueMng.GetComponent<CStickManager>();
 
+            // キューエフェクト生成
+            GameObject cueEffect = PhotonNetwork.Instantiate("CueHaveEffect", Vector3.zero, Quaternion.identity, 0);
         }
 
     }
